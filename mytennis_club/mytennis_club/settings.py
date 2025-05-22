@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'members', #  We have to tell Django that a new app is created.
 ]
 
 MIDDLEWARE = [
