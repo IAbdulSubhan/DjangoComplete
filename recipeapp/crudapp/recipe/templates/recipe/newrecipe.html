@@ -6,11 +6,11 @@
         {% csrf_token %}
         <div class="mb-3">
             <label class="form-label">Recipe Name</label>
-            <input type="text" name="title" class="form-control">
+            <input type="text" required name="title" class="form-control">
         </div>
         <div class="mb-3">
             <label class="form-label">Recipe Description</label>
-            <textarea type="text" name="description" class="form-control" ></textarea>
+            <textarea type="text" required name="description" class="form-control" ></textarea>
         </div>
         <div class="mb-3">
             <label for="formFile" class="form-label">Attach image</label>

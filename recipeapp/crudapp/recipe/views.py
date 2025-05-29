@@ -8,6 +8,14 @@ def home(request):
 
 def recipes(request):
     all_recipes = Recipe.objects.all()
+
+    #search functionality
+    query = request.GET.get('search')
+    if query:
+        all_recipes = Recipe.objects.filter(title__icontains=query)
+    else:
+        all_recipes = Recipe.objects.all()
+
     context = {"recipes": all_recipes}
     return render(request, 'recipe/recipes.html', context) 
 

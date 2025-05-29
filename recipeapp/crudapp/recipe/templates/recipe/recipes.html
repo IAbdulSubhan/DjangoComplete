@@ -3,6 +3,11 @@
 
  {% block content %}
 <h2>Welcome to the Recipes</h2>
+<form class="d-flex justify-content-center align-items-center my-4" style="gap: 10px;">
+  <input class="form-control me-2 w-50 shadow-lg" name="search" required type="text" placeholder="Search Recipe" aria-label="Search">
+  <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+
 <table class="table">
   <thead class="thead-dark">
     <tr class="shadow-lg">
