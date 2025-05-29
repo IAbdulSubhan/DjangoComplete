@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "recipe"
 ]
 
 MIDDLEWARE = [
@@ -114,8 +115,24 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+import os
 
-STATIC_URL = 'static/'
+"""
+====================Setting	Purpose============
+STATICFILES_DIRS	|   Where you (the developer) put static files during development.
+STATIC_ROOT         |	Where Django collects all static files when you run collectstatic for production.
+MEDIA_ROOT          |	Where uploaded files (user content like images) are stored.
+"""
+# Static files (CSS, JS, images that don't change)
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'public/static'),  # Custom folder for your static files
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Used for collectstatic
+
+# Media files (uploaded by users, e.g. images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Where uploaded files are saved
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
