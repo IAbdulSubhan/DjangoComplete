@@ -3,7 +3,7 @@
 {% block content %}
     <h2>Welcome to {{recipe.title}} Page</h2>
 
-    <img src="{{ recipe.image }}" style="height : 300px">
+    <img src="{{ recipe.image.url }}" style="height : 300px">
     <div>
         {{recipe.description}}
     </div>
