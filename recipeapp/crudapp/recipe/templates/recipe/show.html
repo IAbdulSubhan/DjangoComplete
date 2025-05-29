@@ -1,0 +1,10 @@
+{% extends "recipe/base.html" %}
+{% block title %}Recipe detail - Recipe App{% endblock %}
+{% block content %}
+    <h2>Welcome to {{recipe.title}} Page</h2>
+
+    <img src="{{ recipe.image.url }}" style="height : 300px">
+    <div>
+        {{recipe.description}}
+    </div>
+{% endblock content %}

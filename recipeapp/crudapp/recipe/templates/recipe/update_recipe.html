@@ -1,0 +1,21 @@
+{% extends "recipe/base.html" %}
+{% block title %}Update Recipe - Recipe App{% endblock %}
+{% block content %}
+    <h2>Let's Update {{recipe.title}}</h2>
+    <form class="card shadow-lg p-3" method="post" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Recipe Name</label>
+            <input type="text" name="title" value={{recipe.title}} class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Recipe Description</label>
+            <textarea type="text" name="description" class="form-control" >{{recipe.description}}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Attach image</label>
+                <input class="form-control" name="image" type="file" id="formFile">
+            </div>
+        <button type="submit" class="btn btn-primary">update Recipe</button>
+    </form>
+{% endblock %}

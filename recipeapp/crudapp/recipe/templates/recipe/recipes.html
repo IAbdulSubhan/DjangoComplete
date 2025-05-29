@@ -1,0 +1,40 @@
+{% extends "recipe/base.html" %}
+{% block title %}List - Recipe App{% endblock %}
+
+ {% block content %}
+<h2>Welcome to the Recipes</h2>
+<table class="table">
+  <thead class="thead-dark">
+    <tr class="shadow-lg">
+      <th scope="col">#</th>
+      <th scope="col">Recipe Name</th>
+      <th scope="col">Recipe Description</th>
+      <th scope="col">Image</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody class="table-group-divider bg-light">
+        {% for recipe in recipes%}
+        <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td>{{recipe.title}}</td>
+        <td>{{recipe.description | truncatechars:80}}</td>
+        <td>
+                 {% if recipe.image %}
+                  <img src="{{ recipe.image.url }}" onerror="this.onerror=null;this.src='/static/images/404.jpg';" style="height: 100px;">
+                {% else %}
+                    <img src="/static/images/404.jpg" style="height: 100px;">
+                {% endif %}
+        </td>
+        <td>
+          <a href="/show/{{recipe.id}}" class="btn btn-success w-100 mb-2">View</a>                
+          <a href="{%url 'update_recipe' recipe.id%}" class="btn btn-info w-100 mb-2">Edit</a>                
+          {% comment %} <a href="{% url 'delrecipe' recipe.id %}" class="btn btn-danger">Delete</a> {% endcomment %}
+          <a href="/delrecipe/{{ recipe.id }}" class="btn btn-danger w-100">Delete</a>
+
+        </td>
+        </tr>
+        {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
