@@ -18,13 +18,15 @@
         <tr>
         <th scope="row">{{forloop.counter}}</th>
         <td>{{recipe.title}}</td>
-        <td>{{recipe.description}}</td>
+        <td>{{recipe.description | truncatechars:80}}</td>
         <td>
-                <img src="/media/{{recipe.image}}" style="height : 100px">
+                <img src="{{ recipe.image }}" style="height : 100px">
         </td>
-        <td class="gap-1">
-                <button  href="#" type="button" class="btn btn-info">Edit</button>
-                <button  href="#" type="button" class="btn btn-danger">Delete</button>
+        <td>
+          <a href="/show/{{recipe.id}}" class="btn btn-success">View</a>                
+          <a href="#" class="btn btn-info">Edit</a>                
+          {% comment %} <a href="{% url 'delrecipe' recipe.id %}" class="btn btn-danger">Delete</a> {% endcomment %}
+          <a href="/delrecipe/{{ recipe.id }}" class="btn btn-danger">Delete</a>
 
         </td>
         </tr>

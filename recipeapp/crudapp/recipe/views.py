@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.files.storage import FileSystemStorage
 from .models import *
 
@@ -11,10 +11,13 @@ def recipes(request):
     context = {"recipes": all_recipes}
     return render(request, 'recipe/recipes.html', context) 
 
+def delrecipe(reqest, id):
+    recipe = get_object_or_404(Recipe, id = id)
+    recipe.delete()
+    return redirect("recipes")
 
 def newrecipe(request):
-    context = {}  # Always define context upfront
-
+    context = { }
     if request.method == "POST":
         title = request.POST.get("title")
         description = request.POST.get("description")
@@ -35,6 +38,11 @@ def newrecipe(request):
         
 
 
-        return redirect('/newrecipe/')
+        return redirect('recipes')
 
     return render(request, 'recipe/newrecipe.html', context)
+
+def show(request, id):
+    recipe_det = get_object_or_404(Recipe, id=id)
+    context = {"recipe": recipe_det}
+    return render(request, 'recipe/show.html', context)
