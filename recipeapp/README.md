@@ -1,14 +1,16 @@
 # 🍽️ Recipe CRUD App
 
-This is a Django CRUD application where you can add, view, update, and delete recipes with images.
+This is a Django app for managing recipes with Create, Read, Update, and Delete functionality.
 
-## 🚀 Screenshot
+## 📹 Demo
 
-![Recipe Landing Page](screenshots/landingpage.png)
+![Recipe App Demo](recipe-demo.gif)
 
-## ✅ Features
 
-- Add, edit, delete recipes
-- Upload images
-- Beautiful Bootstrap UI
+## Features
+
+- ✅ Add new recipes
+- 🖼️ Upload images
+- ✏️ Edit & delete existing recipes
+- 🔍 Search by recipe title
 
