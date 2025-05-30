@@ -22,6 +22,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),         # localhost/=> home 
+    path('login/', login, name='login'),
+    path('register/', register, name='register'),
     path('recipes/', recipes, name="recipes"),
     path('newrecipe/', newrecipe, name="newrecipe"),
     path('delrecipe/<id>/', delrecipe, name="delrecipe"),
