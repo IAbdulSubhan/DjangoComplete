@@ -1,0 +1,40 @@
+{% extends "recipe/base.html" %}
+{% block title %}Register - Recipe App{% endblock %}
+
+ {% block content %}
+<div class="p-3 shadow-lg">
+    <h2>Register</h2>
+<hr>
+    <form method="POST" action="">
+        {% csrf_token %}
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">
+            {{ message }}
+            </div>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="mb-3">
+        <label for="first_name" class="form-label">First Name</label>
+        <input type="text" class="form-control" name="first_name" aria-describedby="emailHelp">
+    </div>
+    <div class="mb-3">
+        <label for="last_name" class="form-label">Last Name</label>
+        <input type="text" class="form-control" name="last_name"  aria-describedby="emailHelp">
+    </div>
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" class="form-control" name="username" id="exampleInputEmail1" aria-describedby="emailHelp">
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" id="exampleInputPassword1">
+    </div>
+    <p>Already have account?<a href="/login/"> Login</a></p>
+    <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    {% endblock content %}
+
+</div>

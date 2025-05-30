@@ -22,6 +22,9 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('', home, name='home'),         # localhost/=> home 
+    path('login/', login_page, name='login_page'),
+    path('logout/', logout_page, name='logout_page'),
+    path('register/', register, name='register'),
     path('recipes/', recipes, name="recipes"),
     path('newrecipe/', newrecipe, name="newrecipe"),
     path('delrecipe/<id>/', delrecipe, name="delrecipe"),
