@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .seed import recipe_generator
+from django.core.paginator import Paginator
+
 
 
 
@@ -17,12 +19,19 @@ def recipes(request):
 
     #search functionality
     query = request.GET.get('search')
+    
+
     if query:
         all_recipes = Recipe.objects.filter(title__icontains=query)
     else:
         all_recipes = Recipe.objects.all()
+    
 
-    context = {"recipes": all_recipes}
+    paginator = Paginator(all_recipes, 5)
+    page_number =request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {"recipes": page_obj}
     return render(request, 'recipe/recipes.html', context) 
 
 @login_required(login_url = "login_page")
