@@ -24,8 +24,8 @@ def recipes(request):
     return render(request, 'recipe/recipes.html', context) 
 
 @login_required(login_url = "login_page")
-def delrecipe(reqest, id):
-    recipe = get_object_or_404(Recipe, id = id)
+def delrecipe(reqest, slug):
+    recipe = get_object_or_404(Recipe, slug = slug)
     recipe.delete()
     return redirect("recipes")
 
@@ -51,14 +51,14 @@ def newrecipe(request):
 
     return render(request, 'recipe/newrecipe.html', context)
 
-def show(request, id):
-    recipe_det = get_object_or_404(Recipe, id=id)
+def show(request, slug):
+    recipe_det = get_object_or_404(Recipe, slug=slug)
     context = {"recipe": recipe_det}
     return render(request, 'recipe/show.html', context)
 
 @login_required(login_url = "login_page")
-def update_recipe(request, id):
-    recipe = get_object_or_404(Recipe, id=id)
+def update_recipe(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug)
     if request.method == "POST":
         title = request.POST.get("title")
         description = request.POST.get("description")

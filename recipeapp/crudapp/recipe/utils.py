@@ -4,6 +4,7 @@ from .models import Recipe
 
 
 def generate_slug(title: str)->str:
+    
     slug = slugify(title)
 
     while(Recipe.objects.filter(slug=slug).exists):

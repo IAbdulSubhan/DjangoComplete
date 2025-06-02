@@ -1,15 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
+from .utils import generate_slug
 
 class Recipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to='recipes/')
-    slug = models.SlugField(unique=True)
+    #blank=True → taake form se aane wali request mein required na ho
+    slug = models.SlugField(unique=True, blank=True)
 
     def __str__(self):
         return self.title
-    
+
+#🔸 Note: if not self.slug: ka matlab hai slug sirf tab generate ho jab pehli baar save ho raha ho (ya slug empty ho).
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = generate_slug(self.title)
+        super().save(*args, **kwargs)
 
 
