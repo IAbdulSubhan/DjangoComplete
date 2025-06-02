@@ -3,12 +3,12 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .seed import recipe_generator
+# from .seed import recipe_generator
 
 
 
 def home(request):
-    recipe_generator()
+    # recipe_generator()
     return render(request, 'recipe/home.html')
 
 
