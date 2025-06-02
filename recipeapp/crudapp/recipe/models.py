@@ -15,8 +15,16 @@ class Recipe(models.Model):
 
 #🔸 Note: if not self.slug: ka matlab hai slug sirf tab generate ho jab pehli baar save ho raha ho (ya slug empty ho).
     def save(self, *args, **kwargs):
+        print("Save called for:", self.title)
         if not self.slug:
-            self.slug = generate_slug(self.title)
+            print("Slug is empty. Generating...")
+            try:
+                self.slug = generate_slug(self.title)
+                print("Generated slug:", self.slug)
+            except Exception as e:
+                print(f"Slug Error: {e}")
         super().save(*args, **kwargs)
+
+
 
 
