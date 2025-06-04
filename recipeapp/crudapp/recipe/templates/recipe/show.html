@@ -3,8 +3,11 @@
 {% block content %}
     <h2>Welcome to {{recipe.title}} Page</h2>
 
-    <img src="{{ recipe.image.url }}" style="height : 300px">
-    <div>
+                {% if recipe.image %}
+                  <img src="{{ recipe.image.url }}" onerror="this.onerror=null;this.src='/static/images/404.jpg';" style="height: 100px;">
+                {% else %}
+                    <img src="/static/images/404.jpg" style="height: 300px;">
+                {% endif %}    <div>
         {{recipe.description}}
     </div>
 {% endblock content %}
