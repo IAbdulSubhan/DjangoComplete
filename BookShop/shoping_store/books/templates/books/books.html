@@ -1,0 +1,34 @@
+{% extends "base.html" %} 
+{% block title %}Books{% endblock title %} 
+{% block content %}
+<div class="p-5">
+  <table class="table">
+    <thead class="thead-dark dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Book Name</th>
+        <th scope="col">Author</th>
+        <th scope="col">Price $</th>
+        <th scope="col">Cover</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+      <tr>
+        <th scope="row">{{forloop.counter}}</th>
+        <td>{{book.name}}</td>
+        <td>{{book.author}}</td>
+        <td>{{book.price}}</td>
+        <td>
+            {% if book.image %}
+                <img src="{{ book.image }}" onerror="this.onerror=null;this.src='/static/images/404.jpg';" style="height: 100px;">
+            {% else %}
+                <img src="/static/images/404.jpg" style="height: 100px;">
+            {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}
