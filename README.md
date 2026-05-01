@@ -9,3 +9,7 @@
  * User and routes authentication
    ![Recipe App Demo](/recipeapp/recipe-demo.gif)
 
+## Django ORM DOCS
+
+* https://iabdulsubhan.github.io/DjangoComplete/django-orm-docs.html
+
