@@ -933,7 +933,7 @@ User.objects.filter(pk=5).delete()
     store = models.<span class="cl">ForeignKey</span>(<span class="st">'Store'</span>, on_delete=models.CASCADE)
 
     <span class="kw">class</span> <span class="cl">Meta</span>:
-        db_table        = <span class="st">'shop_product'</span>     <span class="cm"># custom table name</span>
+        db_table        = <span class="st">'shop_product'</span>     <span class="cm"># custom table name(Instead of 'appname_product', this table will be named 'shop_product')</span>
         ordering        = [<span class="st">'name'</span>]           <span class="cm"># default alphabetical</span>
         verbose_name    = <span class="st">'Product'</span>
         verbose_name_plural = <span class="st">'Products'</span>
