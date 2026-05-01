@@ -676,8 +676,8 @@ rows = cursor.fetchall()
                                     related_name=<span class="st">'posts'</span>)
     view_count = models.<span class="cl">PositiveIntegerField</span>(default=<span class="nu">0</span>)
     is_active  = models.<span class="cl">BooleanField</span>(default=<span class="kw">True</span>)
-    created_at = models.<span class="cl">DateTimeField</span>(auto_now_add=<span class="kw">True</span>)
-    updated_at = models.<span class="cl">DateTimeField</span>(auto_now=<span class="kw">True</span>)
+    created_at = models.<span class="cl">DateTimeField</span>(auto_now_add (usecase: created_at)=<span class="kw">True</span>)
+    updated_at = models.<span class="cl">DateTimeField</span>(auto_now(usecase: updated_at)=<span class="kw">True</span>)
 
     <span class="kw">class</span> <span class="cl">Meta</span>:
         ordering = [<span class="st">'-created_at'</span>]            <span class="cm"># newest first</span>
