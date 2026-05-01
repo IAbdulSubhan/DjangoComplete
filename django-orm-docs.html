@@ -676,8 +676,8 @@ rows = cursor.fetchall()
                                     related_name=<span class="st">'posts'</span>)
     view_count = models.<span class="cl">PositiveIntegerField</span>(default=<span class="nu">0</span>)
     is_active  = models.<span class="cl">BooleanField</span>(default=<span class="kw">True</span>)
-    created_at = models.<span class="cl">DateTimeField</span>(auto_now_add (usecase: created_at)=<span class="kw">True</span>)
-    updated_at = models.<span class="cl">DateTimeField</span>(auto_now(usecase: updated_at)=<span class="kw">True</span>)
+    created_at = models.<span class="cl">DateTimeField</span>(auto_now_add=<span class="kw">True</span>)
+    updated_at = models.<span class="cl">DateTimeField</span>(auto_now=<span class="kw">True</span>)
 
     <span class="kw">class</span> <span class="cl">Meta</span>:
         ordering = [<span class="st">'-created_at'</span>]            <span class="cm"># newest first</span>
@@ -702,8 +702,8 @@ rows = cursor.fetchall()
             <tr><td><code>IntegerField</code></td><td>Whole numbers</td><td><code>default</code></td><td><code>IntegerField(default=0)</code></td></tr>
             <tr><td><code>FloatField / DecimalField</code></td><td>Decimal numbers</td><td><code>max_digits, decimal_places</code></td><td><code>DecimalField(max_digits=10, decimal_places=2)</code></td></tr>
             <tr><td><code>BooleanField</code></td><td>True/False flags</td><td><code>default</code></td><td><code>BooleanField(default=True)</code></td></tr>
-            <tr><td><code>DateField</code></td><td>Date only (no time)</td><td><code>auto_now, auto_now_add</code></td><td><code>DateField(auto_now_add=True)</code></td></tr>
-            <tr><td><code>DateTimeField</code></td><td>Date + time</td><td><code>auto_now, auto_now_add</code></td><td><code>DateTimeField(auto_now=True)</code></td></tr>
+            <tr><td><code>DateField</code></td><td>Date only (no time)</td><td><code>auto_now, auto_now_add</code></td><td><code>DateField(auto_now_add(usecase: created_at)=True)</code></td></tr>
+            <tr><td><code>DateTimeField</code></td><td>Date + time</td><td><code>auto_now, auto_now_add</code></td><td><code>DateTimeField(auto_now(usecase: updated_at)=True)</code></td></tr>
             <tr><td><code>SlugField</code></td><td>URL-friendly strings</td><td><code>unique, max_length</code></td><td><code>SlugField(unique=True)</code></td></tr>
             <tr><td><code>EmailField</code></td><td>Email addresses</td><td><code>max_length</code></td><td><code>EmailField(unique=True)</code></td></tr>
             <tr><td><code>URLField</code></td><td>URLs/links</td><td><code>max_length</code></td><td><code>URLField(blank=True)</code></td></tr>
@@ -736,6 +736,187 @@ rows = cursor.fetchall()
       <div class="callout warning">
         <div class="callout-title">⚠️ Common Beginner Mistake: null vs blank</div>
         <code>null=True</code> is a <strong>database</strong> concern — it allows NULL in the DB column. <code>blank=True</code> is a <strong>validation</strong> concern — it allows empty values in Django forms. For CharField/TextField, avoid <code>null=True</code> (use <code>blank=True</code> only); for non-string fields like IntegerField, use <code>null=True</code> if the field is optional.
+      </div>
+    </div>
+
+    <!-- 1.2b Field Options FAQ — Commonly Searched Questions -->
+    <div class="section">
+      <h3 class="section-title">Field Options — Your Questions Answered</h3>
+
+      <!-- Q1: editable=False -->
+      <h4 class="subsection-title">① When do we use <code>editable=False</code>?</h4>
+      <p><code>editable=False</code> tells Django to <strong>exclude this field from all ModelForms and the Django Admin</strong>. The field still exists in the database — it just cannot be edited by a user through a form or admin panel.</p>
+      <p><strong>Real-world use cases:</strong></p>
+      <ul>
+        <li>Auto-set timestamps you never want a user to change</li>
+        <li>Fields computed or set by code (e.g., a slug auto-generated from a title)</li>
+        <li>Internal system fields (e.g., a UUID primary key, a hash, a status set by logic)</li>
+      </ul>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">editable=False — Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Order</span>(models.Model):
+    order_number = models.<span class="cl">UUIDField</span>(
+        default=uuid.uuid4,
+        editable=<span class="kw">False</span>    <span class="cm"># ← never shown in forms; set automatically</span>
+    )
+    created_at = models.<span class="cl">DateTimeField</span>(
+        auto_now_add=<span class="kw">True</span>,
+        editable=<span class="kw">False</span>    <span class="cm"># ← auto_now_add implies editable=False already</span>
+    )
+    checksum = models.<span class="cl">CharField</span>(max_length=<span class="nu">64</span>, editable=<span class="kw">False</span>)
+    <span class="cm"># checksum is set by your save() logic, never by the user</span>
+
+<span class="cm"># ✅ This field DOES exist in the DB and can be set in code:
+order = Order()
+order.checksum = compute_hash(order)
+order.save()
+
+# ❌ But it will NOT appear in ModelForm or Django Admin forms</span></pre>
+      </div>
+      <div class="callout info">
+        <div class="callout-title">💡 Note</div>
+        <code>auto_now=True</code> and <code>auto_now_add=True</code> automatically set <code>editable=False</code> internally — you don't need to add it yourself for those fields. It's most useful for fields you compute or assign in code.
+      </div>
+
+      <!-- Q2: verbose_name -->
+      <h4 class="subsection-title">② How is <code>verbose_name</code> used in Forms and Django Admin?</h4>
+      <p><code>verbose_name</code> is the <strong>human-readable label</strong> Django shows for a field in forms and the admin panel. Without it, Django auto-generates a label from the field name by replacing underscores with spaces.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">verbose_name in Action</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">UserProfile</span>(models.Model):
+    dob = models.<span class="cl">DateField</span>(
+        verbose_name=<span class="st">'Date of Birth'</span>   <span class="cm"># Admin/form shows "Date of Birth"</span>
+    )                                    <span class="cm"># Without it: shows "Dob" (ugly!)</span>
+
+    phone_no = models.<span class="cl">CharField</span>(
+        max_length=<span class="nu">15</span>,
+        verbose_name=<span class="st">'Phone Number'</span>
+    )
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        verbose_name = <span class="st">'User Profile'</span>           <span class="cm"># singular (admin list heading)</span>
+        verbose_name_plural = <span class="st">'User Profiles'</span>  <span class="cm"># plural (admin sidebar)</span></pre>
+      </div>
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Can you use verbose_name in ORM queries?</div>
+        <strong>No.</strong> <code>verbose_name</code> is purely a display/UI concept. ORM queries always use the actual Python field name (e.g., <code>filter(dob__gte=...)</code>), never the verbose name. It has zero effect on SQL or query behavior.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Where verbose_name appears</th><th>Where it does NOT appear</th></tr></thead>
+          <tbody>
+            <tr><td>Django Admin field labels</td><td>ORM queries (<code>filter</code>, <code>order_by</code>, etc.)</td></tr>
+            <tr><td>ModelForm field labels</td><td>Database column names</td></tr>
+            <tr><td>Error messages from form validation</td><td>Python attribute access</td></tr>
+            <tr><td>Admin sidebar (verbose_name_plural)</td><td>Migration files</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Q3: choices field -->
+      <h4 class="subsection-title">③ How does the <code>choices</code> option work and what table does it create?</h4>
+      <p><code>choices</code> restricts a field to a fixed set of values. The key insight: <strong>Django does NOT create a separate table for choices</strong>. It stores the raw value (the first item in each tuple) directly in the same column. The choices are enforced only at the form/validation level — not in the database.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">choices — How It Works</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Order</span>(models.Model):
+
+    <span class="cm"># ── Define choices as class-level constants (best practice) ──</span>
+    <span class="kw">class</span> <span class="cl">Status</span>(models.TextChoices):
+        PENDING   = <span class="st">'pending'</span>,   <span class="st">'Pending'</span>
+        PAID      = <span class="st">'paid'</span>,      <span class="st">'Paid'</span>
+        SHIPPED   = <span class="st">'shipped'</span>,   <span class="st">'Shipped'</span>
+        CANCELLED = <span class="st">'cancelled'</span>, <span class="st">'Cancelled'</span>
+
+    status = models.<span class="cl">CharField</span>(
+        max_length=<span class="nu">20</span>,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+
+<span class="cm"># ── What gets stored in the DB? ──────────────────────────────
+# Only the RAW VALUE ('pending', 'paid', etc.) is stored.
+# No extra table is created. Just a VARCHAR column.
+
+# ── How to use in code ────────────────────────────────────────</span>
+order = Order.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+print(order.status)                    <span class="cm"># 'pending'  ← raw stored value</span>
+print(order.<span class="fn">get_status_display</span>())     <span class="cm"># 'Pending'  ← human-readable label</span>
+
+<span class="cm"># Filter using the raw value</span>
+Order.objects.<span class="fn">filter</span>(status=Order.Status.PAID)
+Order.objects.<span class="fn">filter</span>(status=<span class="st">'paid'</span>)    <span class="cm"># same thing</span>
+
+<span class="cm"># ── Old-style tuple syntax (still works) ─────────────────────</span>
+STATUS_CHOICES = [
+    (<span class="st">'P'</span>, <span class="st">'Pending'</span>),
+    (<span class="st">'A'</span>, <span class="st">'Approved'</span>),
+    (<span class="st">'R'</span>, <span class="st">'Rejected'</span>),
+]
+status = models.<span class="cl">CharField</span>(max_length=<span class="nu">1</span>, choices=STATUS_CHOICES)</pre>
+      </div>
+      <div class="callout success">
+        <div class="callout-title">✅ TextChoices vs IntegerChoices vs old tuples</div>
+        Use <code>models.TextChoices</code> (Django 3.0+) — it gives you autocomplete, prevents typos, and auto-generates the choices list. Use <code>models.IntegerChoices</code> when storing integers. Old-style tuple lists still work but are harder to maintain.
+      </div>
+      <div class="callout info">
+        <div class="callout-title">💡 choices vs a separate FK table</div>
+        Use <code>choices</code> when the options are <strong>fixed and defined in code</strong> (e.g., order statuses, priority levels). Use a separate model + ForeignKey when options need to be <strong>created/edited at runtime</strong> by users (e.g., tags, categories, countries). Choices live in your code; FK tables live in your database.
+      </div>
+
+      <!-- Q4: on_delete -->
+      <h4 class="subsection-title">④ What exactly does <code>on_delete=models.CASCADE</code> do?</h4>
+      <p>When you define a <code>ForeignKey</code>, you must tell Django: <em>"What should happen to the child row when the parent row is deleted?"</em> <code>on_delete</code> is your answer. <code>CASCADE</code> means <strong>delete the child too</strong>.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">on_delete — All Options with Real Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    <span class="cm"># CASCADE: delete Post when its Author is deleted
+    # → A post cannot exist without an author. Makes sense.</span>
+    author = models.<span class="cl">ForeignKey</span>(User, on_delete=models.CASCADE)
+
+    <span class="cm"># SET_NULL: keep Post but clear its category when category is deleted
+    # → A post can exist without a category. Requires null=True.</span>
+    category = models.<span class="cl">ForeignKey</span>(Category, on_delete=models.SET_NULL,
+                                    null=<span class="kw">True</span>, blank=<span class="kw">True</span>)
+
+    <span class="cm"># PROTECT: prevent deleting a Tag if any Post still uses it
+    # → Raises ProtectedError — forces you to reassign first.</span>
+    primary_tag = models.<span class="cl">ForeignKey</span>(Tag, on_delete=models.PROTECT,
+                                       null=<span class="kw">True</span>)
+
+    <span class="cm"># SET_DEFAULT: set to a default value when parent deleted</span>
+    editor = models.<span class="cl">ForeignKey</span>(User, on_delete=models.SET_DEFAULT,
+                                  default=<span class="nu">1</span>, related_name=<span class="st">'edited_posts'</span>)
+
+    <span class="cm"># SET(): call a function to get the value to set</span>
+    reviewer = models.<span class="cl">ForeignKey</span>(User, on_delete=models.<span class="fn">SET</span>(get_sentinel_user),
+                                    related_name=<span class="st">'reviewed_posts'</span>, null=<span class="kw">True</span>)
+
+<span class="cm"># ── What CASCADE looks like in practice ──────────────────────────
+# You have: User(id=5) → [Post(id=10), Post(id=11), Post(id=12)]
+
+User.objects.filter(pk=5).delete()
+# SQL: DELETE FROM auth_user WHERE id=5
+# Django then automatically runs:
+# SQL: DELETE FROM blog_post WHERE author_id=5
+# All 3 posts are gone too — cascaded!</span></pre>
+      </div>
+      <div class="callout danger">
+        <div class="callout-title">🚨 CASCADE Can Delete More Than You Think</div>
+        CASCADE is recursive. If Post has Comments with <code>on_delete=CASCADE</code>, then deleting a User deletes their Posts, which deletes all Comments on those posts. Always trace the full cascade chain before using it. Use <code>PROTECT</code> when you want to be safe and explicit.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>on_delete option</th><th>What happens to child row</th><th>Requires</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td><code>CASCADE</code></td><td>Child is deleted too</td><td>—</td><td>Child can't exist without parent</td></tr>
+            <tr><td><code>SET_NULL</code></td><td>FK column set to NULL</td><td><code>null=True</code></td><td>Child can exist alone (optional parent)</td></tr>
+            <tr><td><code>SET_DEFAULT</code></td><td>FK set to field's default</td><td><code>default=...</code></td><td>A meaningful fallback parent exists</td></tr>
+            <tr><td><code>PROTECT</code></td><td>Raises <code>ProtectedError</code></td><td>—</td><td>Must not delete parent while children exist</td></tr>
+            <tr><td><code>RESTRICT</code></td><td>Like PROTECT but smarter in transactions</td><td>—</td><td>Complex deletion logic</td></tr>
+            <tr><td><code>SET(func)</code></td><td>FK set to return value of function</td><td>callable</td><td>Dynamic fallback (e.g., "anonymous" user)</td></tr>
+            <tr><td><code>DO_NOTHING</code></td><td>Nothing — may cause DB integrity error</td><td>—</td><td>When you manage integrity yourself (rare)</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
