@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Django ORM Mastery — Complete Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b27;
+    --surface2: #1e2535;
+    --border: #2a3245;
+    --accent: #44d9a2;
+    --accent2: #7c6af7;
+    --accent3: #f7a94b;
+    --accent4: #e85d8a;
+    --text: #e2e8f5;
+    --text-muted: #7a8ba8;
+    --code-bg: #111827;
+    --green: #44d9a2;
+    --purple: #7c6af7;
+    --orange: #f7a94b;
+    --pink: #e85d8a;
+    --blue: #5ba4f5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    padding: 0 0 40px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 10;
+  }
+
+  .sidebar-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-logo span { color: var(--text-muted); font-size: 13px; font-family: 'Nunito', sans-serif; display: block; margin-top: 2px; }
+
+  .sidebar-search {
+    margin-top: 14px;
+    position: relative;
+  }
+
+  .sidebar-search input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px 8px 36px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .sidebar-search input:focus { border-color: var(--accent); }
+  .sidebar-search input::placeholder { color: var(--text-muted); }
+
+  .sidebar-search::before {
+    content: '⌕';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 16px;
+  }
+
+  .nav-section {
+    padding: 20px 0 0 0;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 24px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 24px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(68,217,162,0.06); }
+
+  .nav-item .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .nav-item.active .dot { opacity: 1; }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0e1117 0%, #161b27 50%, #111827 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(68,217,162,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: 200px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(124,106,247,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(68,217,162,0.1);
+    border: 1px solid rgba(68,217,162,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #e2e8f5 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin-bottom: 32px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 32px;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat .num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--accent);
+  }
+
+  .hero-stat .label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* CONTENT AREA */
+  .content {
+    max-width: 860px;
+    padding: 60px 80px;
+  }
+
+  /* MODULE */
+  .module {
+    margin-bottom: 80px;
+    display: none;
+  }
+
+  .module.active { display: block; }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .module-number {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(68,217,162,0.1);
+    border: 1px solid rgba(68,217,162,0.25);
+    border-radius: 6px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  .module-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 34px;
+    color: var(--text);
+  }
+
+  /* SECTIONS */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .subsection-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 28px 0 12px;
+  }
+
+  p { margin-bottom: 14px; color: #c8d4e8; }
+
+  /* CALLOUT BOXES */
+  .callout {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 4px solid;
+    font-size: 14.5px;
+  }
+
+  .callout.info { background: rgba(91,164,245,0.08); border-color: var(--blue); }
+  .callout.success { background: rgba(68,217,162,0.08); border-color: var(--accent); }
+  .callout.warning { background: rgba(247,169,75,0.08); border-color: var(--orange); }
+  .callout.danger { background: rgba(232,93,138,0.08); border-color: var(--pink); }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .callout.info .callout-title { color: var(--blue); }
+  .callout.success .callout-title { color: var(--accent); }
+  .callout.warning .callout-title { color: var(--orange); }
+  .callout.danger .callout-title { color: var(--pink); }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-lang {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .code-copy {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    transition: all 0.2s;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .code-copy:hover { color: var(--accent); border-color: var(--accent); }
+
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+
+  /* Syntax highlighting via spans */
+  .kw { color: #c792ea; }
+  .cm { color: #546e7a; font-style: italic; }
+  .st { color: #c3e88d; }
+  .fn { color: #82aaff; }
+  .cl { color: var(--orange); }
+  .nu { color: #f78c6c; }
+  .op { color: #89ddff; }
+  .dec { color: var(--accent); }
+  .at { color: #ffcb6b; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 10px; border: 1px solid var(--border); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--surface2); }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(42,50,69,0.5);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  code { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; background: var(--code-bg); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
+
+  /* QUIZ */
+  .quiz-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 32px 0;
+  }
+
+  .quiz-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--accent3);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .quiz-q {
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+    font-size: 14.5px;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+  }
+
+  .quiz-q .qnum {
+    color: var(--accent3);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* NEXT MODULE BUTTON */
+  .next-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #0e1117;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+
+  .next-btn:hover { background: #3bc98f; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(68,217,162,0.25); }
+
+  /* PILL TAGS */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+    margin: 2px;
+  }
+
+  .tag.green { background: rgba(68,217,162,0.15); color: var(--green); }
+  .tag.purple { background: rgba(124,106,247,0.15); color: var(--purple); }
+  .tag.orange { background: rgba(247,169,75,0.15); color: var(--orange); }
+  .tag.pink { background: rgba(232,93,138,0.15); color: var(--pink); }
+  .tag.blue { background: rgba(91,164,245,0.15); color: var(--blue); }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* LIST STYLES */
+  ul, ol { padding-left: 20px; margin: 12px 0; }
+  li { margin-bottom: 6px; color: #c8d4e8; font-size: 15px; }
+  li code { font-size: 12.5px; }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .card-title { font-weight: 700; margin-bottom: 8px; font-size: 15px; color: var(--text); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* SEPARATOR */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 16px 80px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .breadcrumb span { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .hero, .content { padding: 40px 24px; }
+    .hero h1 { font-size: 36px; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      🐍 Django ORM
+      <span>Complete Mastery Guide</span>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" placeholder="Search topics..." id="searchInput" oninput="filterNav(this.value)">
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Your Progress</span><span id="progressText">1 / 6 modules</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:16.6%"></div></div>
+  </div>
+  <nav id="sidebarNav">
+    <div class="nav-section">
+      <div class="nav-section-label">Modules</div>
+      <a class="nav-item active" onclick="showModule(0)" data-label="module 1 fundamentals orm basics">
+        <span class="dot"></span>Module 1 · ORM Fundamentals
+      </a>
+      <a class="nav-item" onclick="showModule(1)" data-label="module 2 relationships foreignkey onetoonefield manytomany">
+        <span class="dot"></span>Module 2 · Relationships
+      </a>
+      <a class="nav-item" onclick="showModule(2)" data-label="module 3 advanced querying annotate aggregate F Q">
+        <span class="dot"></span>Module 3 · Advanced Querying
+      </a>
+      <a class="nav-item" onclick="showModule(3)" data-label="module 4 nested relations deep queries double underscore">
+        <span class="dot"></span>Module 4 · Nested Relations
+      </a>
+      <a class="nav-item" onclick="showModule(4)" data-label="module 5 performance optimization n+1 select_related prefetch_related">
+        <span class="dot"></span>Module 5 · Performance &amp; Optimization
+      </a>
+      <a class="nav-item" onclick="showModule(5)" data-label="module 6 best practices managers signals transactions async">
+        <span class="dot"></span>Module 6 · Best Practices &amp; Advanced
+      </a>
+    </div>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero" id="heroSection">
+    <div class="hero-badge">📚 Complete Learning Path · Beginner to Advanced</div>
+    <h1>Django ORM<br>Mastery Guide</h1>
+    <p>A comprehensive, progressive guide to mastering Django's Object-Relational Mapper — from first models to production-grade query optimization.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">6</div><div class="label">Modules</div></div>
+      <div class="hero-stat"><div class="num">40+</div><div class="label">Topics</div></div>
+      <div class="hero-stat"><div class="num">80+</div><div class="label">Code Examples</div></div>
+      <div class="hero-stat"><div class="num">30+</div><div class="label">Practice Exercises</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 1 ==================== -->
+  <div class="content">
+  <div class="module active" id="module-0">
+    <div class="module-header">
+      <span class="module-number">Module 01</span>
+      <h2 class="module-title">Django ORM Fundamentals</h2>
+    </div>
+
+    <!-- 1.1 What is ORM -->
+    <div class="section">
+      <h3 class="section-title">What is an ORM and Why Django Uses It</h3>
+      <p>Imagine you have a database with tables, rows, and columns. Normally, to get data you'd write raw SQL like <code>SELECT * FROM blog_post WHERE author_id = 5</code>. That's powerful, but tedious, error-prone, and ties your code to a specific database engine.</p>
+      <p>An <strong>ORM (Object-Relational Mapper)</strong> is a layer that lets you interact with your database using Python objects instead of raw SQL. Django's ORM translates your Python code into the correct SQL automatically.</p>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">❌ Without ORM (Raw SQL)</div>
+          <div class="code-block"><pre><span class="kw">import</span> sqlite3
+conn = sqlite3.connect(<span class="st">'db.sqlite3'</span>)
+cursor = conn.cursor()
+cursor.execute(<span class="st">"SELECT * FROM posts WHERE active=1"</span>)
+rows = cursor.fetchall()
+<span class="cm"># Now parse tuples manually...</span></pre></div>
+        </div>
+        <div class="card">
+          <div class="card-title">✅ With Django ORM</div>
+          <div class="code-block"><pre>posts = Post.objects.<span class="fn">filter</span>(active=<span class="kw">True</span>)
+<span class="cm"># Returns Python objects — clean!</span></pre></div>
+        </div>
+      </div>
+      <div class="callout success">
+        <div class="callout-title">✅ Key Benefits of Django ORM</div>
+        Write Python, not SQL · Works with PostgreSQL, MySQL, SQLite, Oracle · Prevents SQL injection automatically · Migrations track schema changes
+      </div>
+    </div>
+
+    <!-- 1.2 Your First Model -->
+    <div class="section">
+      <h3 class="section-title">Models — Your Database Tables</h3>
+      <p>A <strong>Model</strong> is a Python class that maps to a database table. Each attribute of the class maps to a column. Let's build a Blog app from scratch.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — Blog App</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db <span class="kw">import</span> models
+<span class="kw">from</span> django.contrib.auth.models <span class="kw">import</span> User
+
+
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    <span class="cm"># ── Fields ──────────────────────────────────────</span>
+    title      = models.<span class="cl">CharField</span>(max_length=<span class="nu">200</span>)
+    slug       = models.<span class="cl">SlugField</span>(unique=<span class="kw">True</span>)
+    body       = models.<span class="cl">TextField</span>()
+    author     = models.<span class="cl">ForeignKey</span>(User, on_delete=models.CASCADE,
+                                    related_name=<span class="st">'posts'</span>)
+    view_count = models.<span class="cl">PositiveIntegerField</span>(default=<span class="nu">0</span>)
+    is_active  = models.<span class="cl">BooleanField</span>(default=<span class="kw">True</span>)
+    created_at = models.<span class="cl">DateTimeField</span>(auto_now_add=<span class="kw">True</span>)
+    updated_at = models.<span class="cl">DateTimeField</span>(auto_now=<span class="kw">True</span>)
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        ordering = [<span class="st">'-created_at'</span>]            <span class="cm"># newest first</span>
+        verbose_name = <span class="st">'Post'</span>
+        verbose_name_plural = <span class="st">'Posts'</span>
+        indexes = [
+            models.<span class="cl">Index</span>(fields=[<span class="st">'slug'</span>]),
+            models.<span class="cl">Index</span>(fields=[<span class="st">'-created_at'</span>]),
+        ]
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="kw">return</span> self.title</pre>
+      </div>
+
+      <h4 class="subsection-title">All Important Field Types</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Use For</th><th>Key Options</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>CharField</code></td><td>Short text (names, titles)</td><td><code>max_length</code> (required)</td><td><code>CharField(max_length=100)</code></td></tr>
+            <tr><td><code>TextField</code></td><td>Long text (articles, descriptions)</td><td>—</td><td><code>TextField(blank=True)</code></td></tr>
+            <tr><td><code>IntegerField</code></td><td>Whole numbers</td><td><code>default</code></td><td><code>IntegerField(default=0)</code></td></tr>
+            <tr><td><code>FloatField / DecimalField</code></td><td>Decimal numbers</td><td><code>max_digits, decimal_places</code></td><td><code>DecimalField(max_digits=10, decimal_places=2)</code></td></tr>
+            <tr><td><code>BooleanField</code></td><td>True/False flags</td><td><code>default</code></td><td><code>BooleanField(default=True)</code></td></tr>
+            <tr><td><code>DateField</code></td><td>Date only (no time)</td><td><code>auto_now, auto_now_add</code></td><td><code>DateField(auto_now_add=True)</code></td></tr>
+            <tr><td><code>DateTimeField</code></td><td>Date + time</td><td><code>auto_now, auto_now_add</code></td><td><code>DateTimeField(auto_now=True)</code></td></tr>
+            <tr><td><code>SlugField</code></td><td>URL-friendly strings</td><td><code>unique, max_length</code></td><td><code>SlugField(unique=True)</code></td></tr>
+            <tr><td><code>EmailField</code></td><td>Email addresses</td><td><code>max_length</code></td><td><code>EmailField(unique=True)</code></td></tr>
+            <tr><td><code>URLField</code></td><td>URLs/links</td><td><code>max_length</code></td><td><code>URLField(blank=True)</code></td></tr>
+            <tr><td><code>ImageField</code></td><td>Image uploads</td><td><code>upload_to</code></td><td><code>ImageField(upload_to='avatars/')</code></td></tr>
+            <tr><td><code>ForeignKey</code></td><td>Many-to-one relation</td><td><code>on_delete, related_name</code></td><td><code>ForeignKey(User, on_delete=models.CASCADE)</code></td></tr>
+            <tr><td><code>ManyToManyField</code></td><td>Many-to-many relation</td><td><code>through, related_name</code></td><td><code>ManyToManyField('Tag')</code></td></tr>
+            <tr><td><code>OneToOneField</code></td><td>One-to-one relation</td><td><code>on_delete, related_name</code></td><td><code>OneToOneField(User, on_delete=models.CASCADE)</code></td></tr>
+            <tr><td><code>JSONField</code></td><td>JSON data</td><td><code>default=dict</code></td><td><code>JSONField(default=dict)</code></td></tr>
+            <tr><td><code>UUIDField</code></td><td>UUID identifiers</td><td><code>default=uuid.uuid4</code></td><td><code>UUIDField(default=uuid.uuid4)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="subsection-title">Common Field Options</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>What it does</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>null=True</code></td><td>Allows NULL in the database column</td><td><code>False</code></td></tr>
+            <tr><td><code>blank=True</code></td><td>Allows empty string in form validation</td><td><code>False</code></td></tr>
+            <tr><td><code>default=...</code></td><td>Default value if none provided</td><td>—</td></tr>
+            <tr><td><code>unique=True</code></td><td>Database-level uniqueness constraint</td><td><code>False</code></td></tr>
+            <tr><td><code>db_index=True</code></td><td>Creates a database index for fast lookups</td><td><code>False</code></td></tr>
+            <tr><td><code>choices=...</code></td><td>Restricts field to given values</td><td>—</td></tr>
+            <tr><td><code>verbose_name</code></td><td>Human-readable field name</td><td>—</td></tr>
+            <tr><td><code>editable=False</code></td><td>Exclude from forms/admin</td><td><code>True</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Common Beginner Mistake: null vs blank</div>
+        <code>null=True</code> is a <strong>database</strong> concern — it allows NULL in the DB column. <code>blank=True</code> is a <strong>validation</strong> concern — it allows empty values in Django forms. For CharField/TextField, avoid <code>null=True</code> (use <code>blank=True</code> only); for non-string fields like IntegerField, use <code>null=True</code> if the field is optional.
+      </div>
+    </div>
+
+    <!-- 1.3 Meta Options -->
+    <div class="section">
+      <h3 class="section-title">Meta Options</h3>
+      <p>The inner <code>Meta</code> class controls model-level behavior like default ordering, table name, and constraints.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — Meta Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Product</span>(models.Model):
+    name  = models.<span class="cl">CharField</span>(max_length=<span class="nu">200</span>)
+    sku   = models.<span class="cl">CharField</span>(max_length=<span class="nu">50</span>)
+    price = models.<span class="cl">DecimalField</span>(max_digits=<span class="nu">10</span>, decimal_places=<span class="nu">2</span>)
+    store = models.<span class="cl">ForeignKey</span>(<span class="st">'Store'</span>, on_delete=models.CASCADE)
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        db_table        = <span class="st">'shop_product'</span>     <span class="cm"># custom table name</span>
+        ordering        = [<span class="st">'name'</span>]           <span class="cm"># default alphabetical</span>
+        verbose_name    = <span class="st">'Product'</span>
+        verbose_name_plural = <span class="st">'Products'</span>
+
+        <span class="cm"># Composite unique constraint</span>
+        constraints = [
+            models.<span class="cl">UniqueConstraint</span>(
+                fields=[<span class="st">'sku'</span>, <span class="st">'store'</span>],
+                name=<span class="st">'unique_sku_per_store'</span>
+            )
+        ]
+
+        <span class="cm"># Database indexes</span>
+        indexes = [
+            models.<span class="cl">Index</span>(fields=[<span class="st">'name'</span>, <span class="st">'price'</span>]),  <span class="cm"># composite</span>
+            models.<span class="cl">Index</span>(fields=[<span class="st">'-price'</span>]),          <span class="cm"># descending</span>
+        ]</pre>
+      </div>
+    </div>
+
+    <!-- 1.4 Migrations -->
+    <div class="section">
+      <h3 class="section-title">Migrations</h3>
+      <p>Migrations are Django's way of propagating changes you make to your models into your database schema. Think of them as version control for your database.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Terminal — Migration Commands</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># 1. Detect changes in models and create migration files</span>
+python manage.py makemigrations
+
+<span class="cm"># 2. Apply migrations to the database</span>
+python manage.py migrate
+
+<span class="cm"># 3. See what SQL will be run (inspect before applying)</span>
+python manage.py sqlmigrate blog 0001
+
+<span class="cm"># 4. Show migration status</span>
+python manage.py showmigrations
+
+<span class="cm"># 5. Rollback a migration (go back to previous)</span>
+python manage.py migrate blog 0002
+
+<span class="cm"># 6. Fake a migration (mark as applied without running)</span>
+python manage.py migrate blog 0001 --fake
+
+<span class="cm"># 7. Create an empty migration (for data migrations)</span>
+python manage.py makemigrations blog --empty --name=seed_categories</pre>
+      </div>
+      <div class="callout info">
+        <div class="callout-title">💡 Workflow to Remember</div>
+        <strong>Edit models.py → makemigrations → migrate</strong>. Always commit migration files to version control alongside your model changes.
+      </div>
+    </div>
+
+    <!-- 1.5 CRUD -->
+    <div class="section">
+      <h3 class="section-title">CRUD — Create, Read, Update, Delete</h3>
+
+      <h4 class="subsection-title">CREATE</h4>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Python Shell / views.py</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> blog.models <span class="kw">import</span> Post
+<span class="kw">from</span> django.contrib.auth.models <span class="kw">import</span> User
+
+author = User.objects.<span class="fn">get</span>(username=<span class="st">'alice'</span>)
+
+<span class="cm"># Method 1: save() — Two-step, lets you modify before saving</span>
+post = Post(title=<span class="st">'My First Post'</span>, slug=<span class="st">'my-first-post'</span>,
+            body=<span class="st">'Hello world!'</span>, author=author)
+post.save()
+
+<span class="cm"># Method 2: create() — One step, saves immediately</span>
+post = Post.objects.<span class="fn">create</span>(
+    title=<span class="st">'My Second Post'</span>,
+    slug=<span class="st">'my-second-post'</span>,
+    body=<span class="st">'Content here'</span>,
+    author=author
+)
+
+<span class="cm"># Method 3: get_or_create() — Avoid duplicates</span>
+post, created = Post.objects.<span class="fn">get_or_create</span>(
+    slug=<span class="st">'my-first-post'</span>,
+    defaults={<span class="st">'title'</span>: <span class="st">'My First Post'</span>, <span class="st">'body'</span>: <span class="st">'...'</span>, <span class="st">'author'</span>: author}
+)
+<span class="cm"># created=True if new, False if it already existed</span>
+
+<span class="cm"># Method 4: update_or_create()</span>
+post, created = Post.objects.<span class="fn">update_or_create</span>(
+    slug=<span class="st">'my-first-post'</span>,
+    defaults={<span class="st">'title'</span>: <span class="st">'Updated Title'</span>, <span class="st">'is_active'</span>: <span class="kw">True</span>}
+)</pre>
+      </div>
+
+      <h4 class="subsection-title">READ</h4>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Querying the Database</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Get ALL records (returns a QuerySet)</span>
+posts = Post.objects.<span class="fn">all</span>()
+
+<span class="cm"># Get ONE record — raises DoesNotExist or MultipleObjectsReturned</span>
+post = Post.objects.<span class="fn">get</span>(id=<span class="nu">1</span>)
+post = Post.objects.<span class="fn">get</span>(slug=<span class="st">'my-first-post'</span>)
+
+<span class="cm"># Safe get — returns None if not found (no exception)</span>
+<span class="kw">try</span>:
+    post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">999</span>)
+<span class="kw">except</span> Post.DoesNotExist:
+    post = <span class="kw">None</span>
+
+<span class="cm"># filter() — returns QuerySet (can be empty)</span>
+active_posts = Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>)
+my_posts = Post.objects.<span class="fn">filter</span>(author=author, is_active=<span class="kw">True</span>)
+
+<span class="cm"># exclude() — opposite of filter</span>
+not_mine = Post.objects.<span class="fn">exclude</span>(author=author)
+
+<span class="cm"># Ordering</span>
+newest_first = Post.objects.<span class="fn">order_by</span>(<span class="st">'-created_at'</span>)
+by_title     = Post.objects.<span class="fn">order_by</span>(<span class="st">'title'</span>)
+
+<span class="cm"># Slicing (LIMIT/OFFSET in SQL)</span>
+first_five = Post.objects.<span class="fn">all</span>()[:<span class="nu">5</span>]
+page_two   = Post.objects.<span class="fn">all</span>()[<span class="nu">5</span>:<span class="nu">10</span>]
+
+<span class="cm"># first() and last()</span>
+latest = Post.objects.<span class="fn">order_by</span>(<span class="st">'-created_at'</span>).<span class="fn">first</span>()
+oldest = Post.objects.<span class="fn">order_by</span>(<span class="st">'created_at'</span>).<span class="fn">first</span>()</pre>
+      </div>
+
+      <h4 class="subsection-title">UPDATE</h4>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Updating Records</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Method 1: Save on instance — Good for one object, triggers signals</span>
+post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+post.title = <span class="st">'Updated Title'</span>
+post.save()
+
+<span class="cm"># Method 2: update() on QuerySet — Fast bulk update, skips signals</span>
+Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">False</span>).<span class="fn">update</span>(is_active=<span class="kw">True</span>)
+
+<span class="cm"># ⚠️ update() does NOT trigger post_save signals!</span>
+<span class="cm"># update() does NOT call Model.save() — it goes directly to SQL</span>
+
+<span class="cm"># Update specific fields only (more efficient)</span>
+post.title = <span class="st">'New Title'</span>
+post.<span class="fn">save</span>(update_fields=[<span class="st">'title'</span>])  <span class="cm"># Only UPDATEs the title column</span></pre>
+      </div>
+
+      <h4 class="subsection-title">DELETE</h4>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Deleting Records</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Delete a single instance</span>
+post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+post.<span class="fn">delete</span>()
+
+<span class="cm"># Bulk delete via QuerySet</span>
+Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">False</span>).<span class="fn">delete</span>()
+<span class="cm"># Returns: (number_deleted, {model: count_dict})</span>
+
+<span class="cm"># Delete all (be careful!)</span>
+Post.objects.<span class="fn">all</span>().<span class="fn">delete</span>()</pre>
+      </div>
+    </div>
+
+    <!-- 1.6 QuerySets & Lazy Evaluation -->
+    <div class="section">
+      <h3 class="section-title">QuerySets & Lazy Evaluation</h3>
+      <p>A QuerySet is a collection of database objects. The crucial thing to understand: <strong>QuerySets are lazy</strong> — they don't hit the database until you actually need the data.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Lazy Evaluation Demo</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># ❌ NO database query happens here yet!</span>
+posts = Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>)
+
+<span class="cm"># ❌ Still no query — chaining is free</span>
+posts = posts.<span class="fn">order_by</span>(<span class="st">'-created_at'</span>)
+
+<span class="cm"># ✅ DATABASE HIT happens here (evaluation)</span>
+<span class="kw">for</span> post <span class="kw">in</span> posts:       <span class="cm"># iteration evaluates</span>
+    print(post.title)
+
+<span class="cm"># Other things that evaluate a QuerySet:</span>
+list(posts)              <span class="cm"># convert to list</span>
+posts[<span class="nu">0</span>]                 <span class="cm"># indexing</span>
+<span class="fn">len</span>(posts)               <span class="cm"># length (use .count() instead!)</span>
+<span class="fn">bool</span>(posts)              <span class="cm"># boolean check (use .exists() instead!)</span></pre>
+      </div>
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Performance Tip</div>
+        Once evaluated, a QuerySet <strong>caches</strong> its results. Don't evaluate the same QuerySet twice if you can avoid it. Store the result in a variable.
+      </div>
+    </div>
+
+    <!-- 1.7 Field Lookups -->
+    <div class="section">
+      <h3 class="section-title">Field Lookups (The Double Underscore <code>__</code>)</h3>
+      <p>Field lookups are how you specify the SQL <code>WHERE</code> clause. They use the <code>__</code> (double underscore) syntax.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Lookup</th><th>SQL Equivalent</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td><code>__exact</code></td><td><code>= 'value'</code></td><td><code>filter(title__exact='Hello')</code></td></tr>
+            <tr><td><code>__iexact</code></td><td><code>= 'value' (case insensitive)</code></td><td><code>filter(title__iexact='hello')</code></td></tr>
+            <tr><td><code>__contains</code></td><td><code>LIKE '%value%'</code></td><td><code>filter(title__contains='Django')</code></td></tr>
+            <tr><td><code>__icontains</code></td><td><code>LIKE '%value%' (case insensitive)</code></td><td><code>filter(title__icontains='django')</code></td></tr>
+            <tr><td><code>__startswith</code></td><td><code>LIKE 'value%'</code></td><td><code>filter(title__startswith='My')</code></td></tr>
+            <tr><td><code>__endswith</code></td><td><code>LIKE '%value'</code></td><td><code>filter(title__endswith='ORM')</code></td></tr>
+            <tr><td><code>__gt</code></td><td><code>&gt; value</code></td><td><code>filter(view_count__gt=100)</code></td></tr>
+            <tr><td><code>__gte</code></td><td><code>&gt;= value</code></td><td><code>filter(view_count__gte=100)</code></td></tr>
+            <tr><td><code>__lt</code></td><td><code>&lt; value</code></td><td><code>filter(view_count__lt=10)</code></td></tr>
+            <tr><td><code>__lte</code></td><td><code>&lt;= value</code></td><td><code>filter(view_count__lte=10)</code></td></tr>
+            <tr><td><code>__in</code></td><td><code>IN (v1, v2, ...)</code></td><td><code>filter(id__in=[1,2,3])</code></td></tr>
+            <tr><td><code>__isnull</code></td><td><code>IS NULL / IS NOT NULL</code></td><td><code>filter(deleted_at__isnull=True)</code></td></tr>
+            <tr><td><code>__range</code></td><td><code>BETWEEN a AND b</code></td><td><code>filter(price__range=(10, 100))</code></td></tr>
+            <tr><td><code>__date</code></td><td>extract date part</td><td><code>filter(created_at__date=today)</code></td></tr>
+            <tr><td><code>__year / __month</code></td><td>extract year/month</td><td><code>filter(created_at__year=2024)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Field Lookup Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> datetime <span class="kw">import</span> date
+
+<span class="cm"># Search titles containing 'django' (case-insensitive)</span>
+posts = Post.objects.<span class="fn">filter</span>(title__icontains=<span class="st">'django'</span>)
+
+<span class="cm"># Posts with more than 1000 views</span>
+popular = Post.objects.<span class="fn">filter</span>(view_count__gt=<span class="nu">1000</span>)
+
+<span class="cm"># Posts published in 2024</span>
+posts_2024 = Post.objects.<span class="fn">filter</span>(created_at__year=<span class="nu">2024</span>)
+
+<span class="cm"># Posts from specific IDs</span>
+specific = Post.objects.<span class="fn">filter</span>(id__in=[<span class="nu">1</span>, <span class="nu">5</span>, <span class="nu">10</span>])
+
+<span class="cm"># Posts where body contains Django AND views > 100</span>
+results = Post.objects.<span class="fn">filter</span>(
+    body__icontains=<span class="st">'django'</span>,
+    view_count__gt=<span class="nu">100</span>
+)  <span class="cm"># Multiple args = AND condition</span></pre>
+      </div>
+    </div>
+
+    <!-- QUIZ 1 -->
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 1 — Check Your Understanding</div>
+      <div class="quiz-q"><span class="qnum">Q1.</span> What is the difference between <code>null=True</code> and <code>blank=True</code>? When would you use each?</div>
+      <div class="quiz-q"><span class="qnum">Q2.</span> You have a <code>Product</code> model and want to find all products whose name contains "laptop" (case-insensitive) and price is between $500 and $2000. Write the filter query.</div>
+      <div class="quiz-q"><span class="qnum">Q3.</span> What is "lazy evaluation" in QuerySets? Give two examples of operations that actually evaluate (hit the database).</div>
+      <div class="quiz-q"><span class="qnum">Q4.</span> What's the difference between <code>Post.objects.get(pk=1)</code> and <code>Post.objects.filter(pk=1)</code>? When would each fail?</div>
+      <div class="quiz-q"><span class="qnum">Q5.</span> Why should you prefer <code>post.save(update_fields=['title'])</code> over plain <code>post.save()</code> when you only changed the title?</div>
+      <button class="next-btn" onclick="showModule(1)">Next: Relationships →</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 2 ==================== -->
+  <div class="module" id="module-1">
+    <div class="module-header">
+      <span class="module-number">Module 02</span>
+      <h2 class="module-title">Relationships in Django ORM</h2>
+    </div>
+
+    <!-- 2.1 OneToOne -->
+    <div class="section">
+      <h3 class="section-title">OneToOneField</h3>
+      <p>A one-to-one relationship means one record in Table A corresponds to <em>exactly one</em> record in Table B. Classic example: a User has one Profile.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Profile</span>(models.Model):
+    user     = models.<span class="cl">OneToOneField</span>(
+                   User,
+                   on_delete=models.CASCADE,
+                   related_name=<span class="st">'profile'</span>   <span class="cm"># user.profile</span>
+               )
+    bio      = models.<span class="cl">TextField</span>(blank=<span class="kw">True</span>)
+    avatar   = models.<span class="cl">ImageField</span>(upload_to=<span class="st">'avatars/'</span>, blank=<span class="kw">True</span>)
+    website  = models.<span class="cl">URLField</span>(blank=<span class="kw">True</span>)
+    location = models.<span class="cl">CharField</span>(max_length=<span class="nu">100</span>, blank=<span class="kw">True</span>)
+
+<span class="cm"># ── Queries ──────────────────────────────────────────────────</span>
+
+<span class="cm"># Forward access (Profile → User)</span>
+profile = Profile.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+user = profile.user                    <span class="cm"># access the related user</span>
+
+<span class="cm"># Reverse access (User → Profile)</span>
+user = User.objects.<span class="fn">get</span>(username=<span class="st">'alice'</span>)
+profile = user.profile                 <span class="cm"># because related_name='profile'</span>
+
+<span class="cm"># Without related_name it would be: user.profile_set — but OneToOne</span>
+<span class="cm"># creates a single object accessor, not a manager</span></pre>
+      </div>
+    </div>
+
+    <!-- 2.2 ForeignKey -->
+    <div class="section">
+      <h3 class="section-title">ForeignKey (One-to-Many)</h3>
+      <p>One author can write <em>many</em> posts, but each post has only <em>one</em> author. This is a one-to-many relationship, modeled with <code>ForeignKey</code>.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — Blog with Categories</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Category</span>(models.Model):
+    name = models.<span class="cl">CharField</span>(max_length=<span class="nu">100</span>)
+    slug = models.<span class="cl">SlugField</span>(unique=<span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):
+        <span class="kw">return</span> self.name
+
+
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    title    = models.<span class="cl">CharField</span>(max_length=<span class="nu">200</span>)
+    author   = models.<span class="cl">ForeignKey</span>(
+                   User,
+                   on_delete=models.CASCADE,
+                   related_name=<span class="st">'posts'</span>        <span class="cm"># user.posts.all()</span>
+               )
+    category = models.<span class="cl">ForeignKey</span>(
+                   Category,
+                   on_delete=models.SET_NULL,
+                   null=<span class="kw">True</span>,
+                   blank=<span class="kw">True</span>,
+                   related_name=<span class="st">'posts'</span>        <span class="cm"># category.posts.all()</span>
+               )
+
+<span class="cm"># ── Queries ──────────────────────────────────────────────────────
+
+# Forward: Post → Author (simple attribute access)</span>
+post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+print(post.author.username)       <span class="cm"># ⚠️ This does a 2nd query!</span>
+print(post.author_id)             <span class="cm"># ✅ No extra query — stored as FK column</span>
+
+<span class="cm"># Reverse: Author → Posts (returns a Manager)</span>
+alice = User.objects.<span class="fn">get</span>(username=<span class="st">'alice'</span>)
+alices_posts = alice.posts.<span class="fn">all</span>()           <span class="cm"># QuerySet of all Alice's posts</span>
+alices_posts = alice.posts.<span class="fn">filter</span>(is_active=<span class="kw">True</span>)
+
+<span class="cm"># Category → Posts</span>
+tech = Category.objects.<span class="fn">get</span>(slug=<span class="st">'tech'</span>)
+tech_posts = tech.posts.<span class="fn">order_by</span>(<span class="st">'-created_at'</span>)</pre>
+      </div>
+
+      <h4 class="subsection-title">on_delete Options — Explained</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>What happens when parent is deleted</th><th>Use When</th></tr></thead>
+          <tbody>
+            <tr><td><code>CASCADE</code></td><td>Delete all related child objects too</td><td>Children can't exist without parent (posts without author)</td></tr>
+            <tr><td><code>SET_NULL</code></td><td>Set FK column to NULL (requires <code>null=True</code>)</td><td>Children can exist without parent (post without category)</td></tr>
+            <tr><td><code>SET_DEFAULT</code></td><td>Set FK to its default value</td><td>You have a meaningful default</td></tr>
+            <tr><td><code>PROTECT</code></td><td>Raise ProtectedError — prevent deletion</td><td>Parent must not be deleted if children exist</td></tr>
+            <tr><td><code>RESTRICT</code></td><td>Like PROTECT but allows if related objects also deleted in same transaction</td><td>Complex deletion scenarios</td></tr>
+            <tr><td><code>DO_NOTHING</code></td><td>Do nothing — can cause integrity errors!</td><td>Rarely — when you manage integrity yourself</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2.3 ManyToMany -->
+    <div class="section">
+      <h3 class="section-title">ManyToManyField</h3>
+      <p>A post can have many tags, and a tag can belong to many posts. That's a many-to-many relationship. Django creates a <em>junction table</em> automatically.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — Tags (Simple M2M)</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Tag</span>(models.Model):
+    name = models.<span class="cl">CharField</span>(max_length=<span class="nu">50</span>, unique=<span class="kw">True</span>)
+    slug = models.<span class="cl">SlugField</span>(unique=<span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(self): <span class="kw">return</span> self.name
+
+
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    title = models.<span class="cl">CharField</span>(max_length=<span class="nu">200</span>)
+    tags  = models.<span class="cl">ManyToManyField</span>(Tag, related_name=<span class="st">'posts'</span>, blank=<span class="kw">True</span>)
+
+<span class="cm"># ── Many-to-Many Queries ─────────────────────────────────────────
+
+# ADD tags to a post</span>
+post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+django_tag = Tag.objects.<span class="fn">get</span>(slug=<span class="st">'django'</span>)
+python_tag = Tag.objects.<span class="fn">get</span>(slug=<span class="st">'python'</span>)
+
+post.tags.<span class="fn">add</span>(django_tag)
+post.tags.<span class="fn">add</span>(django_tag, python_tag)     <span class="cm"># add multiple</span>
+post.tags.<span class="fn">set</span>([django_tag, python_tag])   <span class="cm"># replace all</span>
+
+<span class="cm"># REMOVE tags</span>
+post.tags.<span class="fn">remove</span>(python_tag)
+post.tags.<span class="fn">clear</span>()                          <span class="cm"># remove all</span>
+
+<span class="cm"># QUERY: all tags of a post</span>
+post.tags.<span class="fn">all</span>()
+
+<span class="cm"># REVERSE: all posts with a tag</span>
+tag = Tag.objects.<span class="fn">get</span>(slug=<span class="st">'django'</span>)
+tag.posts.<span class="fn">all</span>()                            <span class="cm"># uses related_name</span>
+
+<span class="cm"># Filter posts that have a specific tag</span>
+Post.objects.<span class="fn">filter</span>(tags__slug=<span class="st">'django'</span>)</pre>
+      </div>
+
+      <h4 class="subsection-title">Through Model (Custom M2M Table)</h4>
+      <p>Use a <code>through</code> model when you need extra data on the relationship itself (e.g., when a student enrolled in a course, or their grade).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — E-learning with Enrollment</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Student</span>(models.Model):
+    user = models.<span class="cl">OneToOneField</span>(User, on_delete=models.CASCADE)
+
+
+<span class="kw">class</span> <span class="cl">Course</span>(models.Model):
+    title    = models.<span class="cl">CharField</span>(max_length=<span class="nu">200</span>)
+    students = models.<span class="cl">ManyToManyField</span>(
+                   Student,
+                   through=<span class="st">'Enrollment'</span>,
+                   related_name=<span class="st">'courses'</span>
+               )
+
+
+<span class="kw">class</span> <span class="cl">Enrollment</span>(models.Model):
+    <span class="cm">"""The through/junction model with extra data."""</span>
+    student    = models.<span class="cl">ForeignKey</span>(Student, on_delete=models.CASCADE)
+    course     = models.<span class="cl">ForeignKey</span>(Course, on_delete=models.CASCADE)
+    enrolled_at = models.<span class="cl">DateTimeField</span>(auto_now_add=<span class="kw">True</span>)
+    grade      = models.<span class="cl">CharField</span>(max_length=<span class="nu">2</span>, blank=<span class="kw">True</span>)  <span class="cm"># A, B+, etc.</span>
+    completed  = models.<span class="cl">BooleanField</span>(default=<span class="kw">False</span>)
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        unique_together = [<span class="st">'student'</span>, <span class="st">'course'</span>]  <span class="cm"># one enrollment per combo</span>
+
+<span class="cm"># ── Queries with through model ────────────────────────────────────
+
+# Create enrollment (must use through model directly)</span>
+Enrollment.objects.<span class="fn">create</span>(student=student, course=course, grade=<span class="st">'A'</span>)
+
+<span class="cm"># Get all students in a course (through course.students)</span>
+course.students.<span class="fn">all</span>()
+
+<span class="cm"># Get enrollment details</span>
+enrollment = Enrollment.objects.<span class="fn">get</span>(student=student, course=course)
+print(enrollment.grade)
+
+<span class="cm"># All courses a student completed</span>
+student.courses.<span class="fn">filter</span>(enrollment__completed=<span class="kw">True</span>)</pre>
+      </div>
+    </div>
+
+    <!-- related_name -->
+    <div class="section">
+      <h3 class="section-title">related_name — Why It Matters</h3>
+      <div class="callout info">
+        <div class="callout-title">💡 What is related_name?</div>
+        <code>related_name</code> defines the name of the <strong>reverse relation</strong> from the related model back to this one. Without it, Django auto-generates <code>modelname_set</code>. With it, you control the name.
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">related_name Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># WITHOUT related_name → Django auto-creates: user.post_set</span>
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    author = models.<span class="cl">ForeignKey</span>(User, on_delete=models.CASCADE)
+
+user.post_set.<span class="fn">all</span>()     <span class="cm"># works but ugly</span>
+
+<span class="cm"># WITH related_name → you control the accessor name</span>
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    author = models.<span class="cl">ForeignKey</span>(User, on_delete=models.CASCADE,
+                                related_name=<span class="st">'posts'</span>)
+
+user.posts.<span class="fn">all</span>()        <span class="cm"># clean and readable ✅</span>
+
+<span class="cm"># ── When to use '+' as related_name ──────────────────────────────
+# Use '+' to DISABLE the reverse relation (saves memory, avoids clashes)</span>
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    created_by = models.<span class="cl">ForeignKey</span>(User, on_delete=models.CASCADE,
+                                     related_name=<span class="st">'+'</span>)
+<span class="cm"># Now user.post_set does NOT exist — accessing it raises AttributeError
+# Use '+' when you'll NEVER need reverse access from that field</span>
+
+<span class="cm"># ── Multiple FKs to same model — need related_name! ──────────────</span>
+<span class="kw">class</span> <span class="cl">Transfer</span>(models.Model):
+    from_account = models.<span class="cl">ForeignKey</span>(<span class="st">'Account'</span>, on_delete=models.CASCADE,
+                                       related_name=<span class="st">'outgoing_transfers'</span>)
+    to_account   = models.<span class="cl">ForeignKey</span>(<span class="st">'Account'</span>, on_delete=models.CASCADE,
+                                       related_name=<span class="st">'incoming_transfers'</span>)
+<span class="cm"># Without distinct related_names, Django raises a clash error</span></pre>
+      </div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 2 — Check Your Understanding</div>
+      <div class="quiz-q"><span class="qnum">Q1.</span> Design models for a School system: Students, Courses, Teachers. A teacher teaches many courses, a course has many students. What relationships and fields would you use?</div>
+      <div class="quiz-q"><span class="qnum">Q2.</span> When should you use <code>on_delete=CASCADE</code> vs <code>SET_NULL</code>? Give a real-world example for each.</div>
+      <div class="quiz-q"><span class="qnum">Q3.</span> You have two ForeignKey fields in one model both pointing to <code>User</code>. What must you do and why?</div>
+      <div class="quiz-q"><span class="qnum">Q4.</span> In a ManyToMany, when would you need a <code>through</code> model? Give an example scenario.</div>
+      <button class="next-btn" onclick="showModule(2)">Next: Advanced Querying →</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 3 ==================== -->
+  <div class="module" id="module-2">
+    <div class="module-header">
+      <span class="module-number">Module 03</span>
+      <h2 class="module-title">Advanced Querying</h2>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">values() and values_list()</h3>
+      <p>Instead of returning full model objects, <code>values()</code> returns dictionaries and <code>values_list()</code> returns tuples — much more efficient when you only need specific fields.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">values() and values_list()</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># values() → list of dicts</span>
+Post.objects.<span class="fn">values</span>(<span class="st">'id'</span>, <span class="st">'title'</span>, <span class="st">'author__username'</span>)
+<span class="cm"># [{'id': 1, 'title': 'Hello', 'author__username': 'alice'}, ...]</span>
+
+<span class="cm"># values_list() → list of tuples</span>
+Post.objects.<span class="fn">values_list</span>(<span class="st">'id'</span>, <span class="st">'title'</span>)
+<span class="cm"># [(1, 'Hello'), (2, 'World'), ...]</span>
+
+<span class="cm"># flat=True for single field → plain list</span>
+Post.objects.<span class="fn">values_list</span>(<span class="st">'id'</span>, flat=<span class="kw">True</span>)
+<span class="cm"># [1, 2, 3, 4, ...]  ← Just a flat list of IDs</span>
+
+<span class="cm"># Practical use: get all unique categories</span>
+Category.objects.<span class="fn">values_list</span>(<span class="st">'name'</span>, flat=<span class="kw">True</span>)
+
+<span class="cm"># Practical use: build choices for a form</span>
+choices = list(Category.objects.<span class="fn">values_list</span>(<span class="st">'id'</span>, <span class="st">'name'</span>))</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">annotate() and aggregate()</h3>
+      <p><code>aggregate()</code> computes a single value across the whole QuerySet. <code>annotate()</code> computes a value <em>per object</em> and adds it as a new attribute.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Aggregation & Annotation</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> Count, Sum, Avg, Max, Min, F
+
+<span class="cm"># ── aggregate() → single result dict ────────────────────────────</span>
+result = Post.objects.<span class="fn">aggregate</span>(
+    total=<span class="cl">Count</span>(<span class="st">'id'</span>),
+    avg_views=<span class="cl">Avg</span>(<span class="st">'view_count'</span>),
+    max_views=<span class="cl">Max</span>(<span class="st">'view_count'</span>),
+    total_views=<span class="cl">Sum</span>(<span class="st">'view_count'</span>),
+)
+<span class="cm"># {'total': 42, 'avg_views': 128.5, 'max_views': 5000, ...}</span>
+
+<span class="cm"># ── annotate() → per-object value ───────────────────────────────
+
+# Count how many posts each author has</span>
+from django.contrib.auth.models <span class="kw">import</span> User
+
+authors = User.objects.<span class="fn">annotate</span>(post_count=<span class="cl">Count</span>(<span class="st">'posts'</span>))
+<span class="kw">for</span> a <span class="kw">in</span> authors:
+    print(a.username, a.post_count)
+
+<span class="cm"># Count posts per category, ordered by count</span>
+Category.objects\
+    .<span class="fn">annotate</span>(post_count=<span class="cl">Count</span>(<span class="st">'posts'</span>))\
+    .<span class="fn">order_by</span>(<span class="st">'-post_count'</span>)
+
+<span class="cm"># Filter on annotations (HAVING clause)</span>
+popular_authors = User.objects\
+    .<span class="fn">annotate</span>(post_count=<span class="cl">Count</span>(<span class="st">'posts'</span>))\
+    .<span class="fn">filter</span>(post_count__gte=<span class="nu">5</span>)
+
+<span class="cm"># Annotate with Sum — total order value per customer</span>
+<span class="kw">from</span> shop.models <span class="kw">import</span> Customer, Order, OrderItem
+
+customers = Customer.objects.<span class="fn">annotate</span>(
+    total_spent=<span class="cl">Sum</span>(<span class="st">'orders__items__price'</span>)
+).<span class="fn">order_by</span>(<span class="st">'-total_spent'</span>)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">F() Expressions</h3>
+      <p>An <code>F()</code> object lets you reference a field's value in a query <em>without pulling it into Python</em>. The operation happens entirely in the database.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">F() Expression Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> F
+
+<span class="cm"># ❌ BAD — Requires two queries and a Python round-trip</span>
+post = Post.objects.<span class="fn">get</span>(pk=<span class="nu">1</span>)
+post.view_count += <span class="nu">1</span>
+post.<span class="fn">save</span>()
+
+<span class="cm"># ✅ GOOD — Single atomic SQL UPDATE (race-condition safe!)</span>
+Post.objects.<span class="fn">filter</span>(pk=<span class="nu">1</span>).<span class="fn">update</span>(view_count=F(<span class="st">'view_count'</span>) + <span class="nu">1</span>)
+
+<span class="cm"># Compare two fields on same row</span>
+<span class="cm"># Products where stock is less than reorder level</span>
+Product.objects.<span class="fn">filter</span>(stock__lt=F(<span class="st">'reorder_level'</span>))
+
+<span class="cm"># Sort by computed difference</span>
+Product.objects.<span class="fn">annotate</span>(
+    diff=F(<span class="st">'selling_price'</span>) - F(<span class="st">'cost_price'</span>)
+).<span class="fn">order_by</span>(<span class="st">'-diff'</span>)   <span class="cm"># most profitable first</span></pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Q() Objects — Complex OR/AND Queries</h3>
+      <p>Normally, <code>filter()</code> chaining creates AND conditions. For OR or NOT logic, use <code>Q()</code> objects.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Q() Object Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> Q
+
+<span class="cm"># OR: posts about Python OR Django</span>
+Post.objects.<span class="fn">filter</span>(
+    Q(title__icontains=<span class="st">'python'</span>) | Q(title__icontains=<span class="st">'django'</span>)
+)
+
+<span class="cm"># AND with OR: active posts by Alice OR Bob</span>
+Post.objects.<span class="fn">filter</span>(
+    Q(is_active=<span class="kw">True</span>),
+    Q(author__username=<span class="st">'alice'</span>) | Q(author__username=<span class="st">'bob'</span>)
+)
+
+<span class="cm"># NOT: exclude posts about "old"</span>
+Post.objects.<span class="fn">filter</span>(~Q(title__icontains=<span class="st">'old'</span>))
+
+<span class="cm"># Complex: (A OR B) AND NOT C</span>
+Post.objects.<span class="fn">filter</span>(
+    (Q(view_count__gt=<span class="nu">1000</span>) | Q(is_featured=<span class="kw">True</span>)) &
+    ~Q(author__is_staff=<span class="kw">True</span>)
+)
+
+<span class="cm"># Dynamic Q building (e.g., from search form)</span>
+q = Q()
+<span class="kw">if</span> search_term:
+    q &= Q(title__icontains=search_term)
+<span class="kw">if</span> category_id:
+    q &= Q(category_id=category_id)
+results = Post.objects.<span class="fn">filter</span>(q)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Conditional Expressions — Case / When</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Case / When Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> Case, When, Value, IntegerField, CharField
+
+<span class="cm"># Annotate a "popularity" tier per post</span>
+posts = Post.objects.<span class="fn">annotate</span>(
+    popularity=<span class="cl">Case</span>(
+        <span class="cl">When</span>(view_count__gte=<span class="nu">10000</span>, then=<span class="cl">Value</span>(<span class="st">'viral'</span>)),
+        <span class="cl">When</span>(view_count__gte=<span class="nu">1000</span>,  then=<span class="cl">Value</span>(<span class="st">'popular'</span>)),
+        <span class="cl">When</span>(view_count__gte=<span class="nu">100</span>,   then=<span class="cl">Value</span>(<span class="st">'growing'</span>)),
+        default=<span class="cl">Value</span>(<span class="st">'new'</span>),
+        output_field=<span class="cl">CharField</span>(),
+    )
+)
+
+<span class="cm"># Conditional ordering: active posts first</span>
+posts = Post.objects.<span class="fn">annotate</span>(
+    priority=<span class="cl">Case</span>(
+        <span class="cl">When</span>(is_active=<span class="kw">True</span>, then=<span class="cl">Value</span>(<span class="nu">0</span>)),
+        default=<span class="cl">Value</span>(<span class="nu">1</span>),
+        output_field=<span class="cl">IntegerField</span>(),
+    )
+).<span class="fn">order_by</span>(<span class="st">'priority'</span>, <span class="st">'-created_at'</span>)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Subquery() and OuterRef()</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Subquery Examples</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> OuterRef, Subquery
+
+<span class="cm"># Annotate each author with the title of their LATEST post</span>
+latest_post = Post.objects\
+    .<span class="fn">filter</span>(author=OuterRef(<span class="st">'pk'</span>))\
+    .<span class="fn">order_by</span>(<span class="st">'-created_at'</span>)\
+    .<span class="fn">values</span>(<span class="st">'title'</span>)[:<span class="nu">1</span>]
+
+authors = User.objects.<span class="fn">annotate</span>(
+    latest_post_title=<span class="cl">Subquery</span>(latest_post)
+)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Raw SQL When Necessary</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Raw SQL Options</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db <span class="kw">import</span> connection
+
+<span class="cm"># Method 1: Model.objects.raw() — returns model instances</span>
+posts = Post.objects.<span class="fn">raw</span>(
+    <span class="st">'SELECT * FROM blog_post WHERE view_count > %s'</span>, [<span class="nu">100</span>]
+)
+
+<span class="cm"># Method 2: connection.cursor() — for arbitrary SQL</span>
+<span class="kw">with</span> connection.<span class="fn">cursor</span>() <span class="kw">as</span> cursor:
+    cursor.<span class="fn">execute</span>(<span class="st">'SELECT COUNT(*) FROM blog_post'</span>)
+    row = cursor.<span class="fn">fetchone</span>()
+    total = row[<span class="nu">0</span>]
+
+<span class="cm"># ⚠️ ALWAYS use parameterized queries — NEVER string format!</span>
+<span class="cm"># ❌ BAD (SQL Injection risk!)</span>
+cursor.<span class="fn">execute</span>(f<span class="st">'SELECT * FROM blog_post WHERE title = "{user_input}"'</span>)
+
+<span class="cm"># ✅ GOOD (parameterized)</span>
+cursor.<span class="fn">execute</span>(<span class="st">'SELECT * FROM blog_post WHERE title = %s'</span>, [user_input])</pre>
+      </div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 3 — Practice Exercises</div>
+      <div class="quiz-q"><span class="qnum">Q1.</span> Using an e-commerce model (Order, OrderItem, Product), write a query to get the top 5 best-selling products by total quantity sold.</div>
+      <div class="quiz-q"><span class="qnum">Q2.</span> Write a query that finds all users who either have more than 10 posts OR have been active in the last 7 days.</div>
+      <div class="quiz-q"><span class="qnum">Q3.</span> What's the difference between <code>aggregate()</code> and <code>annotate()</code>? When would you use each?</div>
+      <div class="quiz-q"><span class="qnum">Q4.</span> Why is <code>F('view_count') + 1</code> safer than fetching the object, incrementing, and saving?</div>
+      <button class="next-btn" onclick="showModule(3)">Next: Nested Relations →</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 4 ==================== -->
+  <div class="module" id="module-3">
+    <div class="module-header">
+      <span class="module-number">Module 04</span>
+      <h2 class="module-title">Nested Relations & Deep Queries</h2>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Traversing Relationships with <code>__</code></h3>
+      <p>The double underscore <code>__</code> isn't just for field lookups — it also <em>traverses relationships</em>. You can follow ForeignKey, OneToOne, and ManyToMany relationships arbitrarily deep.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Deep Relationship Traversal</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Models: Order → OrderItem → Product → Category
+
+# Get orders that contain products in the "Electronics" category</span>
+Order.objects.<span class="fn">filter</span>(
+    items__product__category__name=<span class="st">'Electronics'</span>
+)
+
+<span class="cm"># Get users who wrote posts tagged with 'django'</span>
+User.objects.<span class="fn">filter</span>(posts__tags__slug=<span class="st">'django'</span>).<span class="fn">distinct</span>()
+<span class="cm"># .distinct() because one user might match multiple times via M2M</span>
+
+<span class="cm"># Filter across 4 levels deep</span>
+<span class="cm"># Company → Department → Employee → Task → status='done'</span>
+Company.objects.<span class="fn">filter</span>(
+    departments__employees__tasks__status=<span class="st">'done'</span>
+)
+
+<span class="cm"># Annotate with nested count</span>
+<span class="kw">from</span> django.db.models <span class="kw">import</span> Count
+
+Order.objects.<span class="fn">annotate</span>(
+    item_count=<span class="cl">Count</span>(<span class="st">'items'</span>),               <span class="cm"># direct relation</span>
+    product_count=<span class="cl">Count</span>(<span class="st">'items__product'</span>, distinct=<span class="kw">True</span>)  <span class="cm"># nested</span>
+)
+
+<span class="cm"># Order by related field</span>
+Post.objects.<span class="fn">order_by</span>(<span class="st">'author__username'</span>)   <span class="cm"># sort by author's name</span>
+
+<span class="cm"># Filter + annotate across relations</span>
+Category.objects\
+    .<span class="fn">filter</span>(posts__is_active=<span class="kw">True</span>)\
+    .<span class="fn">annotate</span>(active_post_count=<span class="cl">Count</span>(<span class="st">'posts'</span>))\
+    .<span class="fn">filter</span>(active_post_count__gt=<span class="nu">5</span>)\
+    .<span class="fn">order_by</span>(<span class="st">'-active_post_count'</span>)</pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">⚠️ Watch Out: distinct() with M2M</div>
+        When filtering across ManyToMany relationships, a single object can appear multiple times in results (once per matching join row). Always add <code>.distinct()</code> to avoid duplicates in your QuerySet.
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">💡 Think of __ as a JOIN</div>
+        Every <code>__</code> hop across a relation adds a JOIN to the generated SQL. Deep queries are powerful but can become slow — this is exactly why Module 5 (performance) matters so much.
+      </div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 4 — Practice</div>
+      <div class="quiz-q"><span class="qnum">Q1.</span> Given models: <code>School → Class → Student → Grade</code>. Write a query to get all schools that have at least one student with a grade above 90.</div>
+      <div class="quiz-q"><span class="qnum">Q2.</span> Why do you need <code>.distinct()</code> when filtering across a ManyToMany relationship?</div>
+      <div class="quiz-q"><span class="qnum">Q3.</span> Write a query to annotate each Category with the number of unique authors who have written posts in that category.</div>
+      <button class="next-btn" onclick="showModule(4)">Next: Performance & Optimization →</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 5 ==================== -->
+  <div class="module" id="module-4">
+    <div class="module-header">
+      <span class="module-number">Module 05</span>
+      <h2 class="module-title">Performance &amp; Optimization</h2>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">The N+1 Query Problem</h3>
+      <p>This is the most common Django performance bug. It happens when you loop over a QuerySet and access a related object inside the loop — causing one query per iteration.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">N+1 Problem Demonstrated</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># ❌ N+1 PROBLEM — 1 query for posts + N queries for authors</span>
+posts = Post.objects.<span class="fn">all</span>()  <span class="cm"># Query 1: SELECT * FROM post</span>
+
+<span class="kw">for</span> post <span class="kw">in</span> posts:
+    print(post.author.username)
+    <span class="cm"># Query 2: SELECT * FROM user WHERE id=1</span>
+    <span class="cm"># Query 3: SELECT * FROM user WHERE id=2</span>
+    <span class="cm"># Query 4: SELECT * FROM user WHERE id=3</span>
+    <span class="cm"># ... N more queries for N posts!</span>
+
+<span class="cm"># With 1000 posts → 1001 queries! ❌❌❌
+
+
+# ✅ SOLUTION: select_related() — Fixes it with a JOIN</span>
+posts = Post.objects.<span class="fn">select_related</span>(<span class="st">'author'</span>).<span class="fn">all</span>()
+<span class="cm"># SELECT post.*, user.* FROM post JOIN user ... — only 1 query!</span>
+
+<span class="kw">for</span> post <span class="kw">in</span> posts:
+    print(post.author.username)  <span class="cm"># No extra query — already loaded!</span></pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">select_related() vs prefetch_related()</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feature</th><th>select_related()</th><th>prefetch_related()</th></tr></thead>
+          <tbody>
+            <tr><td>How it works</td><td>SQL JOIN (single query)</td><td>Separate query + Python joining</td></tr>
+            <tr><td>Use for</td><td>ForeignKey, OneToOneField</td><td>ManyToManyField, reverse FKs, GenericRelations</td></tr>
+            <tr><td>Number of queries</td><td>1 (with JOIN)</td><td>2+ (one per relation)</td></tr>
+            <tr><td>Memory</td><td>Can be large if many rows</td><td>More controlled</td></tr>
+            <tr><td>Nesting</td><td>Use <code>__</code> to follow chains</td><td>Use <code>Prefetch()</code> object for control</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">select_related & prefetch_related</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models <span class="kw">import</span> Prefetch
+
+<span class="cm"># ── select_related (FK & OneToOne → JOIN) ─────────────────────</span>
+posts = Post.objects\
+    .<span class="fn">select_related</span>(<span class="st">'author'</span>)\           <span class="cm"># author FK</span>
+    .<span class="fn">select_related</span>(<span class="st">'author__profile'</span>)\   <span class="cm"># chain: author → profile</span>
+    .<span class="fn">select_related</span>(<span class="st">'category'</span>)           <span class="cm"># category FK</span>
+
+<span class="cm"># Shorthand: all in one call</span>
+posts = Post.objects.<span class="fn">select_related</span>(<span class="st">'author'</span>, <span class="st">'category'</span>)
+
+<span class="cm"># ── prefetch_related (M2M & Reverse FK) ──────────────────────</span>
+posts = Post.objects\
+    .<span class="fn">select_related</span>(<span class="st">'author'</span>)\           <span class="cm"># FK → JOIN</span>
+    .<span class="fn">prefetch_related</span>(<span class="st">'tags'</span>)             <span class="cm"># M2M → separate query</span>
+
+<span class="cm"># ── Prefetch() object for fine control ────────────────────────</span>
+active_posts_prefetch = <span class="cl">Prefetch</span>(
+    <span class="st">'posts'</span>,
+    queryset=Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>).<span class="fn">select_related</span>(<span class="st">'category'</span>),
+    to_attr=<span class="st">'active_posts'</span>   <span class="cm"># store result in .active_posts instead of .posts</span>
+)
+
+authors = User.objects.<span class="fn">prefetch_related</span>(active_posts_prefetch)
+<span class="kw">for</span> author <span class="kw">in</span> authors:
+    <span class="kw">for</span> post <span class="kw">in</span> author.active_posts:   <span class="cm"># uses prefetched list</span>
+        print(post.title)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">only(), defer(), count(), exists(), iterator()</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Query Optimization Tools</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># only() — load ONLY specified fields (defer the rest)</span>
+posts = Post.objects.<span class="fn">only</span>(<span class="st">'id'</span>, <span class="st">'title'</span>, <span class="st">'created_at'</span>)
+<span class="cm"># Accessing post.body will trigger an extra query!</span>
+
+<span class="cm"># defer() — load everything EXCEPT specified fields</span>
+posts = Post.objects.<span class="fn">defer</span>(<span class="st">'body'</span>)   <span class="cm"># skip the big text column</span>
+
+<span class="cm"># count() — efficient COUNT(*) SQL — don't use len(qs)!</span>
+total = Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>).<span class="fn">count</span>()  <span class="cm"># ✅</span>
+total = <span class="fn">len</span>(Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>))      <span class="cm"># ❌ loads all rows</span>
+
+<span class="cm"># exists() — efficient EXISTS check — don't use if qs:</span>
+<span class="kw">if</span> Post.objects.<span class="fn">filter</span>(author=user).<span class="fn">exists</span>():  <span class="cm"># ✅ SELECT 1 LIMIT 1</span>
+    print(<span class="st">'has posts'</span>)
+
+<span class="cm"># iterator() — for large QuerySets, don't cache in memory</span>
+<span class="kw">for</span> post <span class="kw">in</span> Post.objects.<span class="fn">all</span>().<span class="fn">iterator</span>(chunk_size=<span class="nu">500</span>):
+    process(post)
+<span class="cm"># Streams 500 rows at a time — great for data exports</span>
+
+<span class="cm"># explain() — show the query execution plan</span>
+print(Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>).<span class="fn">explain</span>())</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Bulk Operations</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Bulk Create, Update, Delete</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># bulk_create — insert many rows in one query</span>
+posts = [
+    Post(title=<span class="st">f'Post {i}'</span>, slug=<span class="st">f'post-{i}'</span>, author=author, body=<span class="st">'...'</span>)
+    <span class="kw">for</span> i <span class="kw">in</span> range(<span class="nu">1000</span>)
+]
+Post.objects.<span class="fn">bulk_create</span>(posts, batch_size=<span class="nu">100</span>)
+<span class="cm"># ✅ ~10 queries instead of 1000!
+
+# bulk_update — update many rows efficiently</span>
+posts = list(Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">False</span>))
+<span class="kw">for</span> post <span class="kw">in</span> posts:
+    post.is_active = <span class="kw">True</span>
+
+Post.objects.<span class="fn">bulk_update</span>(posts, [<span class="st">'is_active'</span>], batch_size=<span class="nu">100</span>)
+
+<span class="cm"># update() on QuerySet — even better for simple updates</span>
+Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">False</span>).<span class="fn">update</span>(is_active=<span class="kw">True</span>)
+<span class="cm"># 1 single SQL UPDATE — fastest option</span></pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Database Indexing Best Practices</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Indexing in models.py</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    <span class="cm"># db_index=True → single column index</span>
+    slug       = models.<span class="cl">SlugField</span>(unique=<span class="kw">True</span>)          <span class="cm"># unique implies index</span>
+    created_at = models.<span class="cl">DateTimeField</span>(db_index=<span class="kw">True</span>)    <span class="cm"># frequent order_by</span>
+    is_active  = models.<span class="cl">BooleanField</span>(db_index=<span class="kw">True</span>)    <span class="cm"># frequent filter</span>
+
+    <span class="kw">class</span> <span class="cl">Meta</span>:
+        indexes = [
+            <span class="cm"># Composite index for queries that filter+order together</span>
+            models.<span class="cl">Index</span>(fields=[<span class="st">'is_active'</span>, <span class="st">'-created_at'</span>],
+                          name=<span class="st">'post_active_date_idx'</span>),
+        ]
+
+<span class="cm"># ⚠️ Index Rules:
+# ✅ Index: columns in WHERE, ORDER BY, JOIN conditions
+# ✅ Index: high-cardinality columns (many unique values)
+# ❌ Don't index: columns with few unique values (e.g., boolean)
+#    unless combined in a composite index
+# ❌ Don't over-index: each index slows down INSERT/UPDATE/DELETE</span></pre>
+      </div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 5 — Performance Challenge</div>
+      <div class="quiz-q"><span class="qnum">Q1.</span> A view loops through 500 orders and accesses <code>order.customer.name</code> and <code>order.items.all()</code> for each. How many queries does this cause? How would you fix it?</div>
+      <div class="quiz-q"><span class="qnum">Q2.</span> When would you use <code>select_related</code> over <code>prefetch_related</code> and vice versa?</div>
+      <div class="quiz-q"><span class="qnum">Q3.</span> You need to export 500,000 Post records to a CSV. What's the most memory-efficient way to query them?</div>
+      <div class="quiz-q"><span class="qnum">Q4.</span> What's the difference between <code>Post.objects.filter(...).count()</code> and <code>len(Post.objects.filter(...))</code> in terms of performance?</div>
+      <button class="next-btn" onclick="showModule(5)">Next: Best Practices & Advanced →</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODULE 6 ==================== -->
+  <div class="module" id="module-5">
+    <div class="module-header">
+      <span class="module-number">Module 06</span>
+      <h2 class="module-title">Best Practices &amp; Advanced Topics</h2>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Custom Managers &amp; QuerySets</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">models.py — Custom Manager</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">class</span> <span class="cl">PostQuerySet</span>(models.QuerySet):
+    <span class="kw">def</span> <span class="fn">active</span>(self):
+        <span class="kw">return</span> self.<span class="fn">filter</span>(is_active=<span class="kw">True</span>)
+
+    <span class="kw">def</span> <span class="fn">by_author</span>(self, user):
+        <span class="kw">return</span> self.<span class="fn">filter</span>(author=user)
+
+    <span class="kw">def</span> <span class="fn">popular</span>(self, min_views=<span class="nu">1000</span>):
+        <span class="kw">return</span> self.<span class="fn">filter</span>(view_count__gte=min_views)
+
+
+<span class="kw">class</span> <span class="cl">PostManager</span>(models.Manager):
+    <span class="kw">def</span> <span class="fn">get_queryset</span>(self):
+        <span class="kw">return</span> PostQuerySet(self.model, using=self._db)
+
+    <span class="cm"># Delegate custom methods</span>
+    <span class="kw">def</span> <span class="fn">active</span>(self): <span class="kw">return</span> self.<span class="fn">get_queryset</span>().<span class="fn">active</span>()
+    <span class="kw">def</span> <span class="fn">popular</span>(self): <span class="kw">return</span> self.<span class="fn">get_queryset</span>().<span class="fn">popular</span>()
+
+
+<span class="kw">class</span> <span class="cl">Post</span>(models.Model):
+    <span class="cm"># ... fields ...</span>
+    objects = <span class="cl">PostManager</span>()   <span class="cm"># Replace default manager</span>
+
+<span class="cm"># Now you can chain cleanly:</span>
+Post.objects.<span class="fn">active</span>().<span class="fn">popular</span>().<span class="fn">order_by</span>(<span class="st">'-created_at'</span>)</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Signals</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">signals.py</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db.models.signals <span class="kw">import</span> post_save, pre_delete
+<span class="kw">from</span> django.dispatch <span class="kw">import</span> receiver
+<span class="kw">from</span> .models <span class="kw">import</span> Post
+
+<span class="cm"># Auto-create Profile when a User is created</span>
+<span class="at">@receiver</span>(post_save, sender=User)
+<span class="kw">def</span> <span class="fn">create_user_profile</span>(sender, instance, created, **kwargs):
+    <span class="kw">if</span> created:
+        Profile.objects.<span class="fn">create</span>(user=instance)
+
+<span class="cm"># Log before a Post is deleted</span>
+<span class="at">@receiver</span>(pre_delete, sender=Post)
+<span class="kw">def</span> <span class="fn">log_post_deletion</span>(sender, instance, **kwargs):
+    DeletionLog.objects.<span class="fn">create</span>(
+        model=<span class="st">'Post'</span>, object_id=instance.id, title=instance.title
+    )
+
+<span class="cm"># Connect signals in AppConfig.ready()</span>
+<span class="kw">class</span> <span class="cl">BlogConfig</span>(AppConfig):
+    <span class="kw">def</span> <span class="fn">ready</span>(self):
+        <span class="kw">import</span> blog.signals   <span class="cm"># ← make sure this is imported</span></pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Transactions</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Atomic Transactions</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">from</span> django.db <span class="kw">import</span> transaction
+
+<span class="cm"># Decorator — entire function is atomic</span>
+<span class="at">@transaction.atomic</span>
+<span class="kw">def</span> <span class="fn">transfer_funds</span>(from_account, to_account, amount):
+    from_account.balance -= amount
+    from_account.<span class="fn">save</span>()
+    to_account.balance += amount
+    to_account.<span class="fn">save</span>()
+    <span class="cm"># If any exception → both saves are rolled back ✅</span>
+
+<span class="cm"># Context manager — finer control</span>
+<span class="kw">with</span> transaction.<span class="fn">atomic</span>():
+    order = Order.objects.<span class="fn">create</span>(customer=customer)
+    <span class="kw">for</span> item_data <span class="kw">in</span> cart:
+        OrderItem.objects.<span class="fn">create</span>(order=order, **item_data)
+    cart.<span class="fn">clear</span>()
+
+<span class="cm"># Savepoints — nested atomic blocks</span>
+<span class="kw">with</span> transaction.<span class="fn">atomic</span>():
+    order = Order.objects.<span class="fn">create</span>(...)
+    <span class="kw">try</span>:
+        <span class="kw">with</span> transaction.<span class="fn">atomic</span>():    <span class="cm"># savepoint</span>
+            send_email(order)          <span class="cm"># might fail</span>
+    <span class="kw">except</span> EmailError:
+        pass                           <span class="cm"># rolls back only email, not order</span></pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Common Pitfalls to Avoid</h3>
+      <div class="callout danger">
+        <div class="callout-title">🚨 Top Django ORM Mistakes</div>
+        <ul>
+          <li><strong>N+1 queries</strong> — always use <code>select_related</code> / <code>prefetch_related</code> when accessing related objects in loops</li>
+          <li><strong>Using <code>len(qs)</code></strong> instead of <code>qs.count()</code> — loads all rows into memory</li>
+          <li><strong>Using <code>if qs:</code></strong> instead of <code>qs.exists()</code> — same issue</li>
+          <li><strong>Modifying QuerySets after evaluation</strong> — re-filtering an evaluated QS hits DB again</li>
+          <li><strong>Raw SQL without parameterization</strong> — SQL injection vulnerability</li>
+          <li><strong>Signals for complex business logic</strong> — use service layers instead; signals are hard to trace and test</li>
+          <li><strong>Forgetting <code>.distinct()</code> on M2M filters</strong> — causes duplicate results</li>
+          <li><strong>Over-indexing</strong> — every index slows writes; only index what you filter/sort on frequently</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Security Best Practices</h3>
+      <div class="callout success">
+        <div class="callout-title">✅ Security Checklist</div>
+        <ul>
+          <li>Always use ORM or parameterized queries — <strong>never</strong> string-concatenate user input into SQL</li>
+          <li>Use <code>get_object_or_404()</code> in views instead of bare <code>get()</code></li>
+          <li>Validate and sanitize data at the form/serializer layer before saving</li>
+          <li>Use <code>select_for_update()</code> for pessimistic locking in concurrent scenarios</li>
+          <li>Never expose raw database IDs in URLs for sensitive models — use UUIDs or slugs</li>
+        </ul>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">select_for_update — Pessimistic Locking</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="kw">with</span> transaction.<span class="fn">atomic</span>():
+    <span class="cm"># Locks the row until transaction ends — prevents race conditions</span>
+    account = Account.objects\
+        .<span class="fn">select_for_update</span>()\
+        .<span class="fn">get</span>(pk=account_id)
+    account.balance -= amount
+    account.<span class="fn">save</span>()</pre>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3 class="section-title">Async ORM (Django 4.1+)</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Async ORM Usage</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Django 4.1+ supports async ORM operations</span>
+<span class="kw">import</span> asyncio
+<span class="kw">from</span> django.http <span class="kw">import</span> JsonResponse
+
+<span class="kw">async def</span> <span class="fn">post_list</span>(request):
+    <span class="cm"># Async versions of common operations</span>
+    posts = <span class="kw">await</span> Post.objects.<span class="fn">filter</span>(is_active=<span class="kw">True</span>)\
+                              .<span class="fn">aall</span>()    <span class="cm"># async all()</span>
+
+    post = <span class="kw">await</span> Post.objects.<span class="fn">aget</span>(pk=<span class="nu">1</span>)  <span class="cm"># async get()</span>
+
+    <span class="kw">await</span> Post.objects.<span class="fn">acreate</span>(          <span class="cm"># async create()</span>
+        title=<span class="st">'Async Post'</span>, slug=<span class="st">'async'</span>, author=user, body=<span class="st">'...'</span>
+    )
+
+    <span class="kw">return</span> <span class="cl">JsonResponse</span>({<span class="st">'count'</span>: <span class="kw">await</span> Post.objects.<span class="fn">acount</span>()})
+
+<span class="cm"># Note: prefetch_related / select_related work async too
+# For loops over QuerySets use: async for post in Post.objects.all()</span></pre>
+      </div>
+    </div>
+
+    <div class="quiz-box">
+      <div class="quiz-title">🎯 Module 6 — Final Challenge Project</div>
+      <div class="quiz-q"><span class="qnum">Project.</span> Build an E-Commerce data layer with these models: <code>Category, Product, Customer, Order, OrderItem, Review</code>. Then implement:<br><br>
+        1. A custom Manager with <code>in_stock()</code>, <code>by_category()</code>, <code>on_sale()</code> methods on ProductManager<br>
+        2. A query to get the top 10 customers by total spend, with their last order date<br>
+        3. A query to get all products that are low on stock (stock &lt; reorder_level) in the Electronics category<br>
+        4. A transaction-safe <code>place_order(customer, cart_items)</code> function<br>
+        5. A signal that updates a Product's <code>average_rating</code> field whenever a Review is saved</div>
+      <div class="callout success" style="margin-top:20px">
+        <div class="callout-title">🎉 Congratulations!</div>
+        You've completed the Django ORM Mastery Guide. You now have comprehensive knowledge from fundamentals through advanced optimization. Keep practicing with real projects — the best way to solidify this is to build things!
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end .content -->
+</main>
+
+<script>
+let currentModule = 0;
+const totalModules = 6;
+
+function showModule(idx) {
+  document.querySelectorAll('.module').forEach((m, i) => {
+    m.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.nav-item').forEach((n, i) => {
+    n.classList.toggle('active', i === idx);
+  });
+  currentModule = idx;
+  const pct = ((idx + 1) / totalModules * 100).toFixed(1);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${idx + 1} / ${totalModules} modules`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('heroSection').style.display = idx === 0 ? 'block' : 'none';
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+function filterNav(val) {
+  const items = document.querySelectorAll('.nav-item');
+  items.forEach(item => {
+    const label = item.getAttribute('data-label') || '';
+    item.style.display = label.includes(val.toLowerCase()) ? 'flex' : 'none';
+  });
+  if (!val) items.forEach(i => i.style.display = 'flex');
+}
+</script>
+</body>
+</html>
